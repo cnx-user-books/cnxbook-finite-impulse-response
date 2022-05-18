@@ -1,0 +1,147 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Filter design by windowing</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>eec79b26-1d77-445a-b8d1-2c363c1f70e7</md:uuid>
+</metadata>
+
+
+  <content>
+    <section id="sec1">
+      <title>FIR Filter Design by Windowing</title>
+      <section id="subsec1">
+	<title>Desired Ideal Filter Response</title> <para id="p1">Unlike the design of IIR filters, the design of FIR
+	filters starts from the spectrum of the desired filter in the
+	DTFT domain. Let 
+	  <m:math>
+	    <m:apply>
+	      <m:ci type="fn"><m:msub>
+		  <m:mi>H</m:mi>
+		  <m:mi>d</m:mi>
+		</m:msub></m:ci>
+	      <m:apply>
+		<m:exp/>
+		<m:apply>
+		  <m:divide/>
+		  <m:imaginaryi/>
+		  <m:ci>ω</m:ci>
+		</m:apply>
+	      </m:apply>
+	    </m:apply>
+	  </m:math>
+	  be the ideal desired frequency response.  Then, the impulse
+	response
+	  <m:math>
+	    <m:apply>
+	      <m:ci type="fn" class="discrete"><m:msub>
+		  <m:mi>h</m:mi>
+		  <m:mi>d</m:mi>
+		</m:msub></m:ci>
+	      <m:ci>n</m:ci>
+	    </m:apply>
+	  </m:math>
+	corresponding to 
+	  <m:math>
+	    <m:apply>
+	      <m:ci type="fn"><m:msub>
+		  <m:mi>H</m:mi>
+		  <m:mi>d</m:mi>
+		</m:msub></m:ci>
+	      <m:apply>
+		<m:exp/>
+		<m:apply>
+		  <m:divide/>
+		  <m:imaginaryi/>
+		  <m:ci>ω</m:ci>
+		</m:apply>
+	      </m:apply>
+	    </m:apply>
+	  </m:math> is obtained by the inverse
+	DTFT as
+	  <equation id="eqn1">
+	    <m:math>
+	    </m:math>
+	  </equation>
+	  For general desired frequency response, 
+	  <m:math>
+	    <m:apply>
+	      <m:ci type="fn" class="discrete"><m:msub>
+		  <m:mi>h</m:mi>
+		  <m:mi>d</m:mi>
+		</m:msub></m:ci>
+	      <m:ci>n</m:ci>
+	    </m:apply>
+	  </m:math> is usually noncausal and infinitely long.
+	</para>
+      </section>
+      <section id="subsec2">
+	<title>Windowing of Impulse Response</title>
+	<para id="p2">
+	  To obtain an FIR filter approximating the frequency response
+	  of the desired ideal filter, we need to find a filter
+	  impulse response a causal and finite 
+	  <m:math>
+	    <m:apply>
+	      <m:ci type="fn" class="discrete">h</m:ci>
+	      <m:ci>n</m:ci>
+	    </m:apply>
+	  </m:math> that approximates
+	  <m:math>
+	    <m:apply>
+	      <m:ci type="fn" class="discrete"><m:msub>
+		  <m:mi>h</m:mi>
+		  <m:mi>d</m:mi>
+		</m:msub></m:ci>
+	      <m:ci>n</m:ci>
+	    </m:apply>
+	  </m:math>. The simplest way to obtain such
+	  
+	  <m:math>
+	    <m:apply>
+	      <m:ci type="fn" class="discrete">h</m:ci>
+	      <m:ci>n</m:ci>
+	    </m:apply>
+	  </m:math> is to define a new system with impulse response
+	  
+	  <m:math>
+	    <m:apply>
+	      <m:ci type="fn" class="discrete">h</m:ci>
+	      <m:ci>n</m:ci>
+	    </m:apply>
+	  </m:math> given by
+	  <equation id="eqn2">
+	    <m:math>
+	    </m:math>
+	  </equation>
+	  where 
+	  <m:math>
+	    <m:apply>
+	      <m:ci type="fn" class="discrete">w</m:ci>
+	      <m:ci>n</m:ci>
+	    </m:apply>
+	  </m:math> is a finite duration window. For example,
+	  simple truncation corresponds to the <emphasis>boxcar
+	  window</emphasis> given as
+	  <equation id="eqn3">
+	    <m:math>
+	    </m:math>
+	  </equation>
+	  Other commonly used windows include Bartlett, Hamming,
+	  Hanning, and Blackman windows.
+	</para>
+      </section>
+      <section id="subsec3">
+	<title>Frequency Response of Windowed Impulse Response</title>
+	<para id="p3">
+	  Because the multiplication by the window function in time
+	  domain corresponds to a convolution in the DTFT domain, we
+	  can easily visualize the spectrum of the designed FIR
+	  filter. Different window functions have different main lobe
+	  width and peak sidelobe heights. The width of the main lobe
+	  governs the property of the frequency transition at band
+	  edges. The height of the peak sidelobes is related to the
+	  oscillations near the transition frequencies.
+	</para>
+      </section>
+    </section>
+  </content>
+  
+</document>

@@ -1,0 +1,1780 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>C62x Assembly Primer II</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>8851336e-8ead-444b-ae04-c04bbdd23780</md:uuid>
+</metadata>
+
+
+  <content>
+    <section id="section2">
+      <title>Typical Assembly Operations</title>
+      <section id="sec2.1">
+	<title>Loading constants to registers</title>
+	<para id="para1">
+	  Quite often you need to load a register with a constant.
+	  The C62x instructions you can use for this task are
+	  <code>MVK</code>, <code>MVKL</code>, and
+	  <code>MVKH</code>.  Each of these instructions can
+	  load a 16-bit constant to a register.  Read and understand
+	  the description of these instructions in the manual.
+	</para>
+
+	<exercise id="loadingconstants">
+	  <problem id="idp538064">
+	    <para id="para2">
+	      (Loading constants): Write assembly instructions to do
+	      the following:
+	      <list id="ex1list" list-type="enumerated">
+		<item>
+		  Load the 16-bit constant <code>0xff12</code>
+		  to <code>A1</code>.
+		</item>
+		<item>
+		  Load the 32-bit constant
+		  <code>0xabcd45ef</code> to
+		  <code>B0</code>.
+		</item>
+	      </list>
+	    </para>
+	  </problem>
+	  <solution id="idm742912">
+	    <para id="para3">
+	      Intentionally left blank.
+	    </para>
+	  </solution>
+	</exercise>
+      </section>
+
+      <section id="section2.2">
+	<title>Register moves, zeroing</title>
+	<para id="para4">
+	  Contents of one register can be copied to another register
+	  by using the <code>MV</code> instruction.  There is
+	  also the <code>ZERO</code> instruction to set a
+	  register to zero.  Learn how to use these instructions by
+	  reading the appropriate TI manual pages.
+	</para>
+      </section>
+
+      <section id="section2.3">
+	<title>Loading from memory to registers</title>
+	<para id="para5">
+	  Because the C62x processor has the so-called load/store
+	  architecture, you must first load up the content of memory
+	  to a register to be able to manipulate it.  The basic
+	  assembly instructions you use for loading are
+	  <code>LDB</code>, <code>LDH</code>, and
+	  <code>LDW</code> for loading up 8-, 16-, and 32-bit
+	  data from memory.  (There are some variations to these
+	  instructions for different handling of the signs of the
+	  loaded values.)  Read and understand how these instructions
+	  work.
+	</para>
+
+	<para id="para6">
+	  However, to specify the address of the memory location to
+	  load from, you need to load up another register (used as an
+	  address index) and you can use various <term>addressing
+	  modes</term> to specify the memory locations in many different
+	  ways.  The addressing modes is the method by which an
+	  instruction calculates the location of an object in memory.
+	  The table below lists all the possible different ways to
+	  handle the address pointers in C62x CPU. Note the similarity
+	  with the C pointer manipulation.
+	</para>
+
+	<table frame="all" id="table1" summary="">
+	  <tgroup cols="3" align="center" colsep="1" rowsep="1">
+	    <thead>
+	      <row>
+		<entry>Syntax</entry>
+		<entry>Memory address accessed</entry>
+		<entry>Pointer modification</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry align="center"><code>*R</code></entry>
+		<entry align="center"><code>R</code></entry>
+		<entry align="center">None</entry>
+	      </row>
+	      <row>
+		<entry align="center"><code>*++R</code></entry>
+		<entry align="center"><code>R</code></entry>
+		<entry align="center">Preincrement</entry>
+	      </row>
+	      <row>
+		<entry align="center"><code>*--R</code></entry>
+		<entry align="center"><code>R</code></entry>
+		<entry align="center">Predecrement</entry>
+	      </row>
+	      <row>
+		<entry align="center"><code>*R++</code></entry>
+		<entry align="center"><code>R</code></entry>
+		<entry align="center">Postincrement</entry>
+	      </row>
+	      <row>
+		<entry align="center"><code>*R--</code></entry>
+		<entry align="center"><code>R</code></entry>
+		<entry align="center">Postdecrement</entry>
+	      </row>
+	      <row>
+		<entry align="center">
+		  <code>*+R[disp]</code>
+		</entry>
+		<entry align="center"><code>R+disp</code></entry>
+		<entry align="center">None</entry>
+	      </row>
+	      <row>
+		<entry align="center">
+		  <code>*-R[disp]</code>
+		</entry>
+		<entry align="center"><code>R+disp</code></entry>
+		<entry align="center">None</entry>
+	      </row>
+	      <row>
+		<entry align="center">
+		  <code>*++R[disp]</code>
+		</entry>
+		<entry align="center"><code>R+disp</code></entry>
+		<entry align="center">Preincrement</entry>
+	      </row>
+	      <row>
+		<entry align="center">
+		  <code>*--R[disp]</code>
+		</entry>
+		<entry align="center"><code>R+disp</code></entry>
+		<entry align="center">Predecrement</entry>
+	      </row>
+	      <row>
+		<entry align="center">
+		  <code>*R++[disp]</code>
+		</entry>
+		<entry align="center"><code>R+disp</code></entry>
+		<entry align="center">Postincrement</entry>
+	      </row>
+	      <row>
+		<entry align="center">
+		  <code>*R--[disp]</code>
+		</entry>
+		<entry align="center"><code>R+disp</code></entry>
+		<entry align="center">Postdecrement</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+
+	<para id="para7">
+	  The <code>[disp]</code> specifies the number of
+	  elements in word, halfword, or byte, depending on the
+	  instruction type and it can be either <term>5-bit
+	  constant</term> or a <term>register</term>.  The
+	  increment/decrement of the index registers are also in terms
+	  of the number of bytes in word, halfword or byte.  The
+	  addressing modes with displacements are useful when a block
+	  of memory locations is accessed.  Those with automatic
+	  increment/decrement are useful when a block is accessed
+	  consecutively to implement a buffer, for example, to store
+	  signal samples to implement a digital filter.
+	</para>
+
+	<exercise id="loadfrommemory">
+	  <problem id="idm8047072">
+	    <para id="para2q">
+	      (Load from memory): Assume the following values are
+	      stored in memory addresses: 
+	    </para>
+
+	    <code display="block" id="idp4490272">
+	      100h  fe54  7834h
+	      104h  3459  f34dh
+	      108h  2ef5  7ee4h
+	      10ch  2345  6789h
+	      110h  ffff  eeddh
+	      114h  3456  787eh
+	      118h  3f4d  7ab3h
+	    </code>
+
+	    <para id="para8">
+	      Suppose <code>A10 = 0000 0108h</code>.  Find the
+	      contents of <code>A1</code> and
+	      <code>A10</code> after executing the each of the
+	      following instructions.
+	      <list id="list2" list-type="enumerated">
+		<item>
+		  <code>LDW .D1 *A10, A1</code>
+		</item>
+		<item>
+		  <code>LDH .D1 *A10, A1</code>
+		</item>
+		<item>
+		  <code>LDB .D1 *A10, A1</code>
+		</item>
+		<item>
+		  <code>LDW .D1 *-A10[1], A1</code>
+		</item>
+		<item>
+		  <code>LDW .D1 *+A10[1], A1</code>
+		</item>
+		<item>
+		  <code>LDW .D1 *+A10[2], A1</code>
+		</item>
+		<item>
+		  <code>LDB .D1 *+A10[2], A1</code>
+		</item>
+		<item>
+		  <code>LDW .D1 *++A10[1], A1</code>
+		</item>
+		<item>
+		  <code>LDW .D1 *--A10[1], A1</code>
+		</item>
+		<item>
+		  <code>LDB .D1 *++A10[1], A1</code>
+		</item>
+		<item>
+		  <code>LDB .D1 *--A10[1], A1</code>
+		</item>
+		<item>
+		  <code>LDW .D1 *A10++[1], A1</code>
+		</item>
+		<item>
+		  <code>LDW .D1 *A10--[1], A1</code>
+		</item>
+	      </list>
+	    </para>
+	  </problem>
+	  <solution id="idm2451776">
+	    <para id="para8s">
+	      Intentionally left blank.
+	    </para>
+	  </solution>
+	</exercise>
+      </section>
+
+      <section id="section2.4">
+	<title>Storing data to memory</title>
+	<para id="para9">
+	  Storing the register contents uses the same addressing
+	  modes.  The assembly instructions used for storing are
+	  <code>STB</code>, <code>STH</code>, and
+	  <code>STW</code>.  Read and understand these
+	  instructions in the TI manual.
+	</para>
+
+	<exercise id="storememory">
+	  <problem id="idm8051328">
+	    <para id="para9q">
+	      (Storing to memory): Write assembly instructions to
+	      store 32-bit constant <code>53fe 23e4h</code> to
+	      memory address <code>0000 0123h</code>.
+	    </para>
+	  </problem>
+	  <solution id="idm8849424">
+	    <para id="para9s">
+	      Intentionally left blank.
+	    </para>
+	  </solution>
+	</exercise>
+
+	<para id="para10">
+	  Sometimes, it becomes necessary to access part of the data
+	  stored in memory.  For example, if you store the 32-bit word
+	  <code>0x11223344</code> at memory location
+	  <code>0x8000</code>, the four bytes having addresses
+	  location <code>0x8000</code>, location
+	  <code>0x8001</code>, location
+	  <code>0x8002</code>, and location
+	  <code>0x8003</code> contain the value
+	  <code>0x11223344</code>.  Then, if I read the byte
+	  data at memory location <code>0x8000</code>, what
+	  would be the byte value to be read?
+	</para>
+
+	<para id="para11">
+	  The answer depends on the <term>endian mode</term> of the
+	  memory system.  In the <term>little endian mode</term>, the
+	  lower memory addresses contain the LSB part of the
+	  data. Thus, the bytes stored in the four byte addresses will
+	  be as shown in <link target-id="table2" strength="3"/>.
+	</para>
+
+	<table frame="all" id="table2" summary="">
+	  <tgroup cols="2" align="center" colsep="1" rowsep="1">
+	    <tbody>
+	      <row>
+		<entry><code>0x8000</code></entry>
+		<entry><code>0x44</code></entry>
+	      </row>
+	      <row>
+		<entry><code>0x8001</code></entry>
+		<entry><code>0x33</code></entry>
+	      </row>
+	      <row>
+		<entry><code>0x8002</code></entry>
+		<entry><code>0x22</code></entry>
+	      </row>
+	      <row>
+		<entry><code>0x8003</code></entry>
+		<entry><code>0x11</code></entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+
+	<para id="para12">
+	  In the <term>big endian mode</term>, the lower memory
+	  addresses contain the MSB part of the data. Thus, we have 
+	</para>
+
+	<table frame="all" id="table3" summary="">
+	  <tgroup cols="2" align="center" colsep="1" rowsep="1">
+	    <tbody>
+	      <row>
+		<entry><code>0x8000</code></entry>
+		<entry><code>0x11</code></entry>
+	      </row>
+	      <row>
+		<entry><code>0x8001</code></entry>
+		<entry><code>0x22</code></entry>
+	      </row>
+	      <row>
+		<entry><code>0x8002</code></entry>
+		<entry><code>0x33</code></entry>
+	      </row>
+	      <row>
+		<entry><code>0x8003</code></entry>
+		<entry><code>0x44</code></entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+
+	<para id="para13">
+	  In this course, we use the little endian mode by default and
+	  all the lab programming must assume the little endian mode.
+	</para>
+
+	<exercise id="lem">
+	  <problem id="idm221328">
+	    <para id="para13q">
+	      (Little endian mode): What will be the value in
+	      <code>A0</code> after executing the following
+	      assembly instructions? (functional unit specifications
+	      were omitted.)
+	      <list id="list3" list-type="enumerated">
+		<item>
+		  <code>MVKL  0x80000000, A10</code>
+		</item>
+		<item>
+		  <code>MVKH  0x80000000, A10</code>
+		</item>
+		<item>
+		  <code>MVKL  0x12345678, A9</code>
+		</item>
+		<item>
+		  <code>MVKH  0x12345678, A9</code>
+		</item>
+		<item>
+		  <code>STW   A9, *A10</code>
+		</item>
+		<item>
+		  <code>LDB	  *+A10[2],A0</code>
+		</item>
+	      </list>
+
+	      What will be the value in <code>A0</code> if the
+	      system uses the big endian mode?
+	    </para>
+	  </problem>
+	  <solution id="idp4551536">
+	    <para id="para13s">
+	      Intentionally left blank.
+	    </para>
+	  </solution>
+	</exercise>
+
+	<para id="para14">
+	  In fact, the above addressing method describes the so-called
+	  <term>linear</term> addressing mode (default upon reset),
+	  where the offset or increment/decrement of pointers occur
+	  without bound. There is a <term>circular</term> addressing
+	  modes that can handle a finite size buffer efficiently.  You
+	  will implement circular buffers for the FIR filtering
+	  algorithm in the FIR filtering experiments later.
+	</para>
+
+	<para id="para15">
+	  In the C62x CPU, it takes exactly one CPU clock cycle to
+	  execute each instruction.  However, the instructions such as
+	  <code>LDW</code> need to access the slow external
+	  memory and the results of the load are not available
+	  immediately at the end of the execution. This
+	  <emphasis>delay</emphasis> of the execution results is
+	  called <term>delay slots</term>.
+	</para>
+
+	<example id="example1">
+	  <para id="para16">
+	    For example, let's consider loading up the content of
+	    memory content at address pointed by
+	    <code>A10</code> to <code>A1</code> and
+	    then moving the loaded data to <code>A2</code>.
+	    You might be tempted to write simple 2 line assembly code
+	    as follows:
+	  </para>
+
+	  <code display="block" id="idm413696">
+	   1     LDW   .D1    *A10, A1
+	   2     MV    .D1    A1,A2
+	  </code>
+
+	  <para id="para17">
+	    What is wrong with the above code?  The result of the
+	    <code>LDW</code> instruction is not available
+	    immediately after <code>LDW</code> is executed.
+	    As a consequence, the <code>MV</code> instruction
+	    does not copy the desired value of <code>A1</code>
+	    to <code>A2</code>.  To prevent this undesirable
+	    execution, we need to make the CPU wait until the result
+	    of the <code>LDW</code> instruction is correctly
+	    loaded to <code>A1</code> before executing the
+	    <code>MV</code> instruction.  For load
+	    instructions, we need extra 4 clock cycles until the load
+	    results are valid.  To make the CPU wait for 4 clock
+	    cycles, we need to insert 4 <code>NOP</code> (no
+	    operations) instructions between <code>LDW</code>
+	    and <code>MV</code>.  Each
+	    <code>NOP</code> instruction makes the CPU idle
+	    for one clock cycle.  The resulting code will be like
+	    this:
+	  </para>
+
+	  <code display="block" id="idp4655888">
+	    1     LDW    .D1    *A10, A1
+	    2     NOP
+	    3     NOP
+	    4     NOP
+	    5     NOP
+	    6     MV     .D1    A1,A2
+	  </code>
+
+	  <para id="para17a">
+	    or simply you can write
+	  </para>
+
+	  <code display="block" id="idp4658224">
+	    1     LDW    .D1    *A10, A1
+	    2     NOP  4
+	    3     MV     .D1    A1,A2
+	  </code>
+	</example>
+
+	<para id="para18">
+	  Then, why didn't the designer of the CPU make such that
+	  <code>LDW</code> instruction takes 5 clock cycles to
+	  begin with, rather than let the programmer insert 4
+	  <code>NOPs</code>?  The answer is that you can
+	  insert other instructions other than
+	  <code>NOPs</code> as far as those instructions do
+	  not use the result of the <code>LDW</code>
+	  instruction above.  By doing this, the CPU can execute
+	  additional instructions while waiting for the result of the
+	  <code>LDW</code> instruction to be valid, greatly
+	  reducing the total execution time of the entire program.
+	</para>
+      </section>
+
+      <section id="section2.5">
+	<title>More on instructions with delay slots</title>
+	<para id="para19">
+	  The Table 3-5 in TI's instruction set description shows the
+	  execution of the instructions with delay slots in more
+	  detail.  The instructions with delay slots are multiply
+	  (<code>MPY</code>, 1 delay slot), the load
+	  (<code>LDB, LDW</code> <foreign>etc.</foreign> 4 delay slots)
+	  instructions, and the branch (<code>B</code>, 5
+	  delay slots) instruction.
+	</para>
+
+	<para id="para20">
+	  The <term>functional unit latency</term> indicates for how
+	  many clock cycles each instructions actually use a
+	  functional unit.  All C62x instructions have 1 functional
+	  unit latency, meaning that each functional unit is ready to
+	  execute the next instruction after 1 clock cycle regardless
+	  of the delay slots of the instructions.  Therefore, the
+	  following instructions are valid:
+	</para>
+
+	<code display="block" id="idm1553360">
+	1     LDW    .D1    *A10, A4
+	2     ADD    .D1    A1,A2,A3
+	</code>
+
+	<para id="para21">
+	  Although the first <code>LDW</code> instruction do
+	  not load the <code>A4</code> register correctly
+	  while the <code>ADD</code> is executed, the
+	  <code>D1</code> functional unit becomes available
+	  in the clock cycle right after the one in which
+	  <code>LDW</code> is executed.
+	</para>
+
+	<para id="para22">
+	  To clarify the execution of instructions with delay slots,
+	  let's think of the following example of
+	  <code>LDW</code> instruction.  Let's assume
+	  <code>A10 = 0x0100</code> <code>A2=1</code>,
+	  and your intent is loading <code>A9</code> with the
+	  32-bit word at the address <code>0x0104</code>.  The
+	  3 <code>MV</code> instructions are not related to
+	  the <code>LDW</code> instruction.  They do something
+	  else.
+	</para>
+
+	<code display="block" id="idp1740032">
+	  1     LDW    .D1    *A10++[A2], A9
+	  2     MV     .L1    A10, A8
+	  3     MV     .L1    A1, A10
+	  4     MV     .L1    A1, A2
+	  5     ...
+	</code>
+
+	<para id="para23">
+	  We can ask several interesting questions at this point:
+	  <list id="list4" list-type="enumerated">
+	    <item>
+	      What is the value loaded to <code>A8</code>?
+	      That is, in which clock cycle, the address pointer is
+	      updated?
+	    </item>
+	    <item>
+	      Can we load the address offset register
+	      <code>A2</code> before the
+	      <code>LDW</code> instruction finishes the actual
+	      loading?
+	    </item>
+	    <item>
+	      Is it legal to load to <code>A10</code> before
+	      the first <code>LDW</code> finishes loading the
+	      memory content to <code>A9</code>?  That is, can
+	      we change the address pointer before the 4 delay slots
+	      elapse?
+	    </item>
+	  </list>
+	  Here are the answers:
+	  <list id="list5" list-type="enumerated">
+	    <item>
+	      Although it takes extra 4 clock cycles for the
+	      <code>LDW</code> instruction to load the memory
+	      content to <code>A9</code>, the address pointer
+	      and offset registers (<code>A10</code> and
+	      <code>A2</code>) are read and updated in the
+	      clock cycle the <code>LDW</code> instruction is
+	      issued. Therefore, in line 2, <code>A8</code> is
+	      loaded with the updated <code>A10</code>, that
+	      is <code>A10 = A8 = 0x104</code>.
+	    </item>
+	    <item>
+	      Because the <code>LDW</code> reads the
+	      <code>A10</code> and <code>A2</code>
+	      registers in the first clock cycle, you are free to
+	      change these registers and do not affect the operation
+	      of the first <code>LDW</code>.
+	    </item>
+	    <item>This was already answered above.</item>
+	  </list>
+	</para>
+
+	<para id="para24">
+	  Similar theory holds for <code>MPY</code> and
+	  <code>B</code> (when using a register as a branch
+	  address) instructions.  The <code>MPY</code> reads
+	  in the source values in the first clock cycle and loads the
+	  multiplication result after the 2nd clock cycle.  For
+	  <code>B</code>, the address pointer is read in the
+	  first clock cycle, and the actual branching occurs after the
+	  5th clock cycle.  Thus, after the first clock cycle, you are
+	  free to modify the source or the address pointer registers.
+	  For more details, refer Table 3-5 in the instruction set
+	  description or read the description of the individual
+	  instruction.
+	</para>
+      </section>
+
+      <section id="section2.6">
+	<title>Addition, Subtraction and Multiplication</title>
+	<para id="para25">
+	  There are several instructions for addition, subtraction and
+	  multiplication on C62x CPU.  The basic instructions are
+	  <code>ADD</code>, <code>SUB</code>, and
+	  <code>MPY</code>.  Learn about these instructions in
+	  the TI manual.  <code>ADD</code> and
+	  <code>SUB</code> have 0 delay slots (meaning the
+	  results of operation are immediately available), but the
+	  <code>MPY</code> has 1 delay slot (the result of
+	  multiplication is valid after additional 1 clock cycle).
+	</para>
+
+	<exercise id="addsubmult">
+	  <problem id="idm1289760">
+	    <para id="para25q">
+	      (Add, subtract, and multiply): Write an assembly program
+	      to compute <code>( 0000 ef35h + 0000 33dch - 0000
+	      1234h ) * 0000 0007h</code>
+	    </para>
+	  </problem>
+	  <solution id="idp348928">
+	    <para id="para25s">
+	      Intentionally left blank.
+	    </para>
+	  </solution>
+	</exercise>
+      </section>
+
+      <section id="section2.7">
+	<title>Branching and conditional operations</title>
+	<para id="para26">
+	  Often you need to control the flow of the program execution
+	  by branching to another block of code.  The
+	  <code>B</code> instruction does the job in the C62x
+	  CPU.  The address of the branch can be specified either by
+	  displacement or stored in a register to be used by the
+	  <code>B</code> instruction.  Read and understand the
+	  <code>B</code> instruction in the manual.  The
+	  <code>B</code> instruction has 5 delay slots,
+	  meaning that the actual branch occurs in the 5th clock cycle
+	  after the instruction is executed.
+	</para>
+
+	<para id="para27">
+	  In many cases, depending on the result of previous
+	  operations, you execute the branch instruction
+	  conditionally.  For example, to implement a loop, you
+	  decrement the loop counter by 1 each time you run a set of
+	  instructions and whenever the loop counter is not zero, you
+	  need to branch to the beginning of the code block to iterate
+	  the loop operations.  In C62x CPU, this conditional
+	  branching is implemented using the <term>conditional
+	  operations</term>. Although <code>B</code> may be
+	  the instruction implemented using conditional operations
+	  most often, all instructions in C62x can be conditional.
+	</para>
+
+	<para id="para28">
+	  Conditional instructions are represented in code by using
+	  square brackets, <code>[ ]</code>, surrounding the
+	  condition register name.  For example, the following
+	  <code>B</code> instruction is executed only if
+	  <code>B0</code> is nonzero:
+	</para>
+
+	<code display="block" id="idm1069920">
+	  1    [B0]    B     .L1    A0
+	</code>
+
+	<para id="para29">
+	  To execute an instruction conditionally when the condition
+	  register is zero, we use ! in front of the register.  For
+	  example, the <code>B</code> instruction is executed
+	  when <code>B0</code> is zero.
+	</para>
+
+	<code display="block" id="idp1166864">
+	  1    [!B0]    B     .L1    A0
+	</code>
+
+	<para id="para30">
+	  Not all registers can be used as the condition registers.
+	  In C62x CPU, the registers that can be tested in conditional
+	  operations are <code>B0</code>,
+	  <code>B1</code>, <code>B2</code>,
+	  <code>A1</code>, <code>A2</code>.
+	</para>
+
+	<exercise id="simpleloop">
+	  <problem id="idp4165504">
+	    <para id="para30q">
+	      (Simple loop): Write an assembly program computing the
+	      summation 
+	      <m:math>
+		<m:apply>
+		  <m:sum/>
+		  <m:bvar><m:ci>n</m:ci></m:bvar>
+		  <m:lowlimit><m:cn>1</m:cn></m:lowlimit>
+		  <m:uplimit><m:cn>100</m:cn></m:uplimit>
+		  <m:ci>n</m:ci>
+		</m:apply>
+	      </m:math> by implementing a simple loop.
+	    </para>
+	  </problem>
+	  <solution id="idp4170592">
+	    <para id="para30s">
+	      Intentionally left blank.
+	    </para>
+	  </solution>
+	</exercise>
+      </section>
+
+      <section id="section2.8">
+	<title>Logical operations and bit manipulation</title>
+	<para id="para31">
+	  The logical operations and bit manipulations are
+	  accomplished by the <code>AND</code>,
+	  <code>OR</code>, <code>XOR</code>,
+	  <code>CLR</code>, <code>SET</code>,
+	  <code>SHL</code>, and <code>SHR</code>
+	  instructions.  Read and understand the operations of these
+	  instructions.
+	</para>
+      </section>
+
+      <section id="section2.9">
+	<title>Other assembly instructions</title>
+	<para id="para32">
+	  Other useful instructions include <code>IDLE</code>
+	  and compare instructions such as <code>CMPEQ</code>
+	  <foreign>etc.</foreign>  Read and understand the operations of these
+	  instructions.
+	</para>
+      </section>
+
+      <section id="section2.10">
+	<title>C62x instruction set summary</title>
+	<para id="para33">
+	  The set of instructions that can be performed in each
+	  functional unit is as follows (See <link target-id="table.s" strength="3"/>, <link target-id="table.l" strength="3"/>,
+	  <link target-id="table.d" strength="3"/> and <link target-id="table.m" strength="3"/>).  Please refer to
+	  <cite><cite-title>TMS320C62x/C67x CPU and Instruction Set Reference
+	  Guide</cite-title></cite> for detailed description of each instruction.
+	</para>
+
+	<table frame="all" id="table.s" summary="">
+	  <title>.S Unit</title>
+	  <tgroup cols="2" align="left" colsep="1" rowsep="1">
+	    <thead>
+	      <row>
+		<entry>Instruction</entry>
+		<entry>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry><code>ADD(U)</code></entry>
+		<entry>
+		  signed or unsigned integer addition without
+		  saturation
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>ADDK</code></entry>
+		<entry>
+		  integer addition using signed 16-bit constant
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>ADD2</code></entry>
+		<entry>
+		  two 16-bit integer adds on upper and lower register
+		  halves
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>B</code></entry>
+		<entry>branch using a register</entry>
+	      </row>
+	      <row>
+		<entry><code>CLR</code></entry>
+		<entry>clear a bit field</entry>
+	      </row>
+	      <row>
+		<entry><code>EXT</code></entry>
+		<entry>extract and sign-extend a bit field</entry>
+	      </row>
+	      <row>
+		<entry><code>MV</code></entry>
+		<entry>move from register to register</entry>
+	      </row>
+	      <row>
+		<entry><code>MVC</code></entry>
+		<entry>
+		  move between the control file and the register file
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>MVK</code></entry>
+		<entry>
+		  move a 16-bit constant into a register and sign
+		  extend
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>MVKH</code></entry>
+		<entry>
+		  move 16-bit constant into the upper bits of a
+		  register
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>NEG</code></entry>
+		<entry>negate (pseudo-operation)</entry>
+	      </row>
+	      <row>
+		<entry><code>NOT</code></entry>
+		<entry>bitwise NOT</entry>
+	      </row>
+	      <row>
+		<entry><code>OR</code></entry>
+		<entry>bitwise OR</entry>
+	      </row>
+	      <row>
+		<entry><code>SET</code></entry>
+		<entry>set a bit field</entry>
+	      </row>
+	      <row>
+		<entry><code>SHL</code></entry>
+		<entry>arithmetic shift left</entry>
+	      </row>
+	      <row>
+		<entry><code>SHR</code></entry>
+		<entry>arithmetic shift right</entry>
+	      </row>
+	      <row>
+		<entry><code>SSHL</code></entry>
+		<entry>shift left with saturation</entry>
+	      </row>
+	      <row>
+		<entry><code>SUB(U)</code></entry>
+		<entry>
+		  signed or unsigned integer subtraction without
+		  saturation
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>SUB2</code></entry>
+		<entry>
+		  two 16-bit integer integer subs on upper and lower
+		  register halves
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>XOR</code></entry>
+		<entry>exclusive OR</entry>
+	      </row>
+	      <row>
+		<entry><code>ZERO</code></entry>
+		<entry>zero a register (pseudo-operation)</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+
+	<table frame="all" id="table.l" summary="">
+	  <title>.L Unit</title>
+	  <tgroup cols="2" align="left" colsep="1" rowsep="1">
+	    <thead>
+	      <row>
+		<entry>Instruction</entry>
+		<entry>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry><code>ABS</code></entry>
+		<entry>integer absolute value with saturation</entry>
+	      </row>
+	      <row>
+		<entry><code>ADD(U)</code></entry>
+		<entry>
+		  signed or unsigned integer addition without
+		  saturation
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>AND</code></entry>
+		<entry>bitwise AND</entry>
+	      </row>
+	      <row>
+		<entry><code>CMPEQ</code></entry>
+		<entry>integer compare for equality</entry>
+	      </row>
+	      <row>
+		<entry><code>CMPGT(U)</code></entry>
+		<entry>
+		  signed or unsigned integer compare for greater than
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>CMPLT(U)</code></entry>
+		<entry>
+		  signed or unsigned integer compare for less than
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>LMBD</code></entry>
+		<entry>leftmost bit detection</entry>
+	      </row>
+	      <row>
+		<entry><code>MV</code></entry>
+		<entry>move from register to register</entry>
+	      </row>
+	      <row>
+		<entry><code>NEG</code></entry>
+		<entry>negate (pseudo-operation)</entry>
+	      </row>
+	      <row>
+		<entry><code>NORM</code></entry>
+		<entry>normalize integer</entry>
+	      </row>
+	      <row>
+		<entry><code>NOT</code></entry>
+		<entry>bitwise NOT</entry>
+	      </row>
+	      <row>
+		<entry><code>+OR</code></entry>
+		<entry>bitwise OR</entry>
+	      </row>
+	      <row>
+		<entry><code>SADD</code></entry>
+		<entry>
+		  integer addition with saturation to result size
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>SAT</code></entry>
+		<entry>
+		  saturate a 40-bit integer to a 32-bit integer
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>SSUB</code></entry>
+		<entry>
+		  integer subtraction with saturation to result size
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>SUBC</code></entry>
+		<entry>
+		  conditional integer subtraction and shift - used for
+		  division
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>XOR</code></entry>
+		<entry>exclusive OR</entry>
+	      </row>
+	      <row>
+		<entry><code>ZERO</code></entry>
+		<entry>zero a register (pseudo-operation)</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+
+	<table frame="all" id="table.d" summary="">
+	  <title>.D Unit</title>
+	  <tgroup cols="2" align="left" colsep="1" rowsep="1">
+	    <thead>
+	      <row>
+		<entry>Instruction</entry>
+		<entry>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry><code>ADD(U)</code></entry>
+		<entry>
+		  signed or unsigned integer addition without
+		  saturation
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>ADDAB (B/H/W)</code></entry>
+		<entry>integer addition using addressing mode</entry>
+	      </row>
+	      <row>
+		<entry><code>LDB (B/H/W)</code></entry>
+		<entry>
+		  load from memory with a 15-bit constant offset
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>MV</code></entry>
+		<entry>move from register to register</entry>
+	      </row>
+	      <row>
+		<entry><code>STB (B/H/W)</code></entry>
+		<entry>
+		  store to memory with a register offset or 5-bit
+		  unsigned constant offset
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>SUB(U)</code></entry>
+		<entry>
+		  signed or unsigned integer subtraction without
+		  saturation
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>SUBAB (B/H/W)</code></entry>
+		<entry>
+		  integer subtraction using addressing mode
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>ZERO</code></entry>
+		<entry>zero a register (pseudo-operation)</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+
+	<table frame="all" id="table.m" summary="">
+	  <title>.M Unit</title>
+	  <tgroup cols="2" align="left" colsep="1" rowsep="1">
+	    <thead>
+	      <row>
+		<entry>Instruction</entry>
+		<entry>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry><code>MPY (U/US/SU)</code></entry>
+		<entry>
+		  signed or unsigned integer multiply 16lsb*16lsb
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>MPYH (U/US/SU)</code></entry>
+		<entry>
+		  signed or unsigned integer multiply 16msb*16msb
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>MPYLH</code></entry>
+		<entry>
+		  signed or unsigned integer multiply 16lsb*16msb
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>MPYHL</code></entry>
+		<entry>
+		  signed or unsigned integer multiply 16msb*16lsb
+		</entry>
+	      </row>
+	      <row>
+		<entry><code>SMPY (HL/LH/H)</code></entry>
+		<entry>
+		  integer multiply with left shift and saturation
+		</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </section>
+    </section>
+
+    <section id="section3">
+      <title>Useful assembler directives</title>
+      <para id="para34">
+	Other than the CPU instruction set, there are special commands
+	to the assembler that direct the assembler to do various jobs
+	when assembling the code.  You should learn about some of
+	these <term>assembler directives</term> to be able to write an
+	assembly program.  There are useful assembler directives you
+	can use to let the assembler know various settings, such as
+	<code>.set, .macro, .endm, .ref, .align, .word, .byte
+	.include</code>.,
+      </para>
+
+      <para id="para35">
+	The <code>.set</code> directive defines a symbolic
+	name.  For example, you can have
+      </para>
+
+      <code display="block" id="idp2040768">
+	1    count    .set    40
+      </code>
+
+      <para id="para36">
+	Then, the assembler replaces each occurrence of
+	<code>count</code> with <code>40</code>.
+      </para>
+
+      <para id="para37">
+	You have already seen how the <code>.ref</code>
+	directive is used to declare symbolic names defined in another
+	file.  It is similar to the <code>extern</code>
+	declaration in C.
+      </para>
+
+      <para id="para38">
+	The <code>.space</code> directive reserves a memory
+	space with specified number of bytes.  For example, you can
+	have
+      </para>
+
+      <code display="block" id="idp2049664">
+	1    buffer    .space    128
+      </code>
+
+      <para id="para39">
+	to define a buffer of size 128 bytes.  The symbol
+	<code>buffer</code> has the address of the first byte
+	reserved by <code>.space</code>.  The
+	<code>.bes</code> directive is similar to
+	<code>.space</code>, but the label has the address of
+	the last byte reserved.
+      </para>
+
+      <para id="para40">
+	To put a constant value in the memory, you can use
+	<code>.byte</code>, <code>.word</code>,
+	<foreign>etc.</foreign> If you have
+      </para>
+
+      <code display="block" id="idp2058960">
+	1    const1    .word    0x1234
+      </code>
+
+      <para id="para41">
+	the assembler places the word constant <code>0x1234</code> at
+	a memory location and <code>const1</code> has the address of
+	the memory location. <code>.byte</code>
+	<foreign>etc.</foreign> works similarly.
+      </para>
+
+      <para id="para42">
+	Sometimes you need to place your data or code at a specific
+	memory address boundaries such as word, halfword,
+	<foreign>etc.</foreign> You can use the <code>.align</code>
+	directive to do this.  For example, if you have
+      </para>
+
+      <code display="block" id="idp2913376">
+	1               .align    4
+	2     buffer    .space    128
+	3               ...
+      </code>
+
+      <para id="para43">
+	Then, the first address of the reserved 128 bytes is at the
+	word boundary in memory, that is the 2 LSBs of the address (in
+	binary) are 0.  Similarly, for half-word alignment, you should
+	have <code>.align</code> directive to do this.  For
+	example, if you have
+      </para>
+
+      <code display="block" id="idp2916672">
+	1               .align    2
+	2     buffer    .space    128
+	3               ...
+      </code>
+
+      <para id="para44">
+	The <code>.include</code> directive is used to read
+	the source lines from another file.  If you have
+      </para>
+
+      <code display="block" id="idp2919760">
+	1               .include    ``other.asm''
+      </code>
+
+      <para id="para45">
+	will input the lines in <code>other.asm</code> at this
+	location.  This is useful when working with multiple files.
+	Instead of making a project having multiple files, you can
+	simply include these different files in one file.
+      </para>
+
+      <para id="para46">
+	Other assembler directives include <code>.end</code>,
+	<foreign>etc.</foreign> You will learn about the macro
+	directives <code>.macro, .endm</code> later <!-- where - cnxn
+	needed-->.
+      </para>
+
+      <para id="para47">
+	How do you write comments in your assembly program?  Anything
+	that follows <code>;</code> is considered as a comment
+	and ignored by the assembler.  For example,
+      </para>
+
+      <code display="block" id="idp2928928">
+	1     ; this is a comment
+	2             ADD     .L1     A1,A2,A3      ;add a1 and a2
+      </code>
+    </section>
+
+    <section id="section4">
+      <title>Assigning functional units</title>
+      <para id="para48">
+	Each instruction has particular functional units that can
+	execute it.  For a complete list of the instructions that can be
+	executed in each functional unit, see Table 3-2 in the
+	instruction set manual.  Note that some instructions can be
+	executed by several different functional units.
+      </para>
+
+      <para id="para49">
+	<link target-id="fig1" strength="3"/> shows how data and
+	addresses can be transfered between the registers, functional
+	units and the external memory.  If you observe carefully, the
+	destination path (marked as <emphasis>dst</emphasis>) going
+	out of the <code>.L1, .S1, .M1</code> and
+	<code>D1</code> units are connected to the register
+	file A.
+	<note type="note" id="idp1467888">
+	  This means that any instruction with one of the A registers
+	  as destination (the result of operation is stored in one of
+	  A registers) should be executed in one of these 4 functional
+	  units.
+	</note>
+	For the same reason, if the instructions have B registers as
+	destination, the <code>.L2, .S2, .M2</code> and
+	<code>D2</code> units should be used.
+      </para>
+<!--
+      <figure id='fig1'>
+	<media type='image/' src=''/>
+      </figure>
+-->
+      <para id="para50">
+	Therefore if you know the instruction and the destination
+	register, you should be able to assign the functional unit to
+	it.
+      </para>
+
+      <exercise id="ex4a">
+	<problem id="idp1473616">
+	  <para id="expara1">
+	    (Functional units):  List all the functional units you can
+	    assign to each of these instructions: 
+
+	    <list id="ex4alist" list-type="enumerated">
+	      <item>
+		<code>ADD .?? A0,A1,A2</code>
+	      </item>
+	      <item>
+		<code>B   .?? A1</code>
+	      </item>
+	      <item>
+		<code>MVKL .?? 000023feh, B0</code>
+	      </item>
+	      <item>
+		<code>LDW  .?? *A10, A3</code>
+	      </item>
+	    </list>
+	  </para>
+	</problem>
+	<solution id="idp1483632">
+	  <para id="s4p">
+	    Intentionally left blank.
+	  </para>
+	</solution>
+      </exercise>
+
+      <para id="para51">
+	If you look at <link target-id="fig1" strength="3"/> again, each
+	functional unit must receive one of the source data from the
+	corresponding register file. <!-- % For %the \verb+.D+ units,
+	both of the source must come from the same register file, %but
+	other units can obtain one of the source data from the other
+	%register file.--> For example, look at the following assembly
+	instruction:
+      </para>
+
+      <code display="block" id="idp1668208">
+	1     ADD   .L1    A0,B0,A1
+      </code>
+
+      <para id="para52">
+	The <code>.L1</code> unit gets data from
+	<code>A0</code> (this is natural) and
+	<code>B0</code> (this is not) and stores the result in
+	<code>A1</code> (this is a must).  The data path
+	through which the content of <code>B0</code> is
+	conveyed to the <code>.L1</code> unit is called
+	<code>1X</code> <term>cross path</term>.  When this
+	happens, we add <code>x</code> to the functional unit
+	to designate the cross path:
+      </para>
+
+      <code display="block" id="idp1677824">
+	1    ADD    .L1x    A0,B0,A1
+      </code>
+
+      <para id="para53">
+	Similarly the data path from register file
+	<code>B</code> to the <code>.M2, .S2</code>
+	and <code>.L2</code> units are called
+	<code>2X</code> cross path.
+      </para>
+
+      <exercise id="ex8">
+	<problem id="idp1684416">
+	  <para id="pex8p">
+	    (Cross path): List all the functional units that can be
+	    assigned to each of the instruction:
+
+	    <list id="ex8list" list-type="enumerated">
+	      <item>
+		<code>ADD .??? B0,A1,B2</code>
+	      </item>
+	      <item>
+		<code>MPY .??? A1,B2,A4</code>
+	      </item>
+	    </list>
+	  </para>
+	</problem>
+	<solution id="idp1691248">
+	  <para id="s8p">
+	    Intentionally left blank.
+	  </para>
+	</solution>
+      </exercise>
+
+      <para id="para54">
+	In fact, when you write an assembly program, you can omit the
+	functional unit assignment altogether.  The assembler figures
+	out the available functional units and properly assigns them.
+	However, manually assigned functional units help you to figure
+	out where the actual execution takes place and how the data
+	move around between register files and functional units.  This
+	is particularly useful when you put multiple instructions in
+	parallel.  We will learn about the parallel instructions later
+	on.
+      </para>
+    </section>
+
+    <section id="section5">
+      <title>Writing the inner product program</title>
+      <para id="para55">
+	Now you should know enough about C62x assembly to implement
+	the inner product algorithm to compute 
+	<m:math display="block">
+	  <m:apply>
+	    <m:eq/>
+	    <m:ci>y</m:ci>
+	    <m:apply>
+	      <m:sum/>
+	      <m:bvar><m:ci>n</m:ci></m:bvar>
+	      <m:lowlimit>
+		<m:cn>1</m:cn>
+	      </m:lowlimit>
+	      <m:uplimit>
+		<m:cn>10</m:cn>
+	      </m:uplimit>
+	      <m:apply>
+		<m:vectorproduct/>
+		<m:ci><m:msub>
+		    <m:mi>a</m:mi>
+		    <m:mi>n</m:mi>
+		  </m:msub></m:ci>
+		<m:ci><m:msub>
+		    <m:mi>x</m:mi>
+		    <m:mi>n</m:mi>
+		  </m:msub></m:ci>
+	      </m:apply>
+	    </m:apply>
+	  </m:apply>
+	</m:math>
+      </para>
+
+      <exercise id="ex9">
+	<problem id="idp2340736">
+	  <para id="ex9q">(Inner product): Write the complete inner
+	    product assembly program to compute
+	    <m:math display="block">
+	      <m:apply>
+		<m:eq/>
+		<m:ci>y</m:ci>
+		<m:apply>
+		  <m:sum/>
+		  <m:bvar><m:ci>n</m:ci></m:bvar>
+		  <m:lowlimit>
+		    <m:cn>1</m:cn>
+		  </m:lowlimit>
+		  <m:uplimit>
+		    <m:cn>10</m:cn>
+		  </m:uplimit>
+		  <m:apply>
+		    <m:vectorproduct/>
+		    <m:ci><m:msub>
+			<m:mi>a</m:mi>
+			<m:mi>n</m:mi>
+		      </m:msub></m:ci>
+		    <m:ci><m:msub>
+			<m:mi>x</m:mi>
+			<m:mi>n</m:mi>
+		      </m:msub></m:ci>
+		  </m:apply>
+		</m:apply>
+	      </m:apply>
+	    </m:math>
+	    where 
+	    <m:math>
+	      <m:ci><m:msub>
+		  <m:mi>a</m:mi>
+		  <m:mi>n</m:mi>
+		</m:msub></m:ci>
+	    </m:math> and 
+
+	    <m:math>
+	      <m:ci><m:msub>
+		  <m:mi>x</m:mi>
+		  <m:mi>n</m:mi>
+		</m:msub></m:ci>
+	    </m:math>
+	    take the following values: 
+	  </para>
+
+	  <code display="block" id="idp2353616">
+	    a[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, a }
+	    x[] = { f, e, d, c, b, a, 9, 8, 7, 6 }
+	  </code>
+
+	  <para id="para56">
+	    The 
+	    <m:math>
+	      <m:ci><m:msub>
+		  <m:mi>a</m:mi>
+		  <m:mi>n</m:mi>
+		</m:msub></m:ci>
+	    </m:math> and 
+
+	    <m:math>
+	      <m:ci><m:msub>
+		  <m:mi>x</m:mi>
+		  <m:mi>n</m:mi>
+		</m:msub></m:ci>
+	    </m:math>
+	    values must be stored in memory and the inner product is
+	    computed by reading the memory contents.
+	  </para>
+	</problem>
+	<solution id="idp2359584">
+	  <para id="ex9s">
+	    Intentionally left blank.
+	  </para>
+	</solution>
+      </exercise>
+    </section>
+
+    <section id="section6">
+      <title>Pipeline, Delay slots and Parallel instructions</title>
+      <para id="para57">
+	When an instruction is executed, it takes several steps, which
+	are fetching, decoding, and execution.  If these steps are
+	done one at a time for each instruction, the CPU resources are
+	not fully utilized.  To increase the throughput, CPUs are
+	designed to be pipelined, meaning that the foregoing steps are
+	carried out at the same time.
+      </para>
+
+      <para id="para58">
+	On the C6x processor, the instruction fetch consists of 4
+	phases; generate fetch address (F1), send address to memory
+	(F2), wait for data (F3), and read opcode from memory (F4).
+	Decoding consists of 2 phases; dispatching to functional units
+	(D1) and decoding (D2).  The execution step may consist of up
+	to 6 phases (E1 to E6) depending on the instructions.  For
+	example, the multiply (<code>MPY</code>) instructions
+	has 1 delay resulting in 2 execution phases.  Similarly, load
+	(<code>LDx</code>) and branch (<code>B</code>)
+	instructions have 4 and 5 delays respectively.
+      </para>
+
+      <para id="para59">
+	When the outcome of an instruction is used by the next
+	instruction, an appropriate number of
+	<code>NOP</code>s (no operation or delay) must be
+	added after multiply (one <code>NOP</code>), load
+	(four <code>NOP</code>s, or <code>NOP
+	4</code>), and branch (five <code>NOP</code>s, or
+	<code>NOP 5</code>) instructions in order to allow the
+	pipeline to operate properly.  Otherwise, before the outcome
+	of the current instruction is available (which is to be used
+	by the next instruction), the next instructions are executed
+	by the pipeline, generating undesired results.  The following
+	code is an example of pipelined code with
+	<code>NOP</code>s inserted:
+      </para>
+
+      <code display="block" id="idm984048">
+	 1             MVK    40,A2
+	 2     loop:   LDH    *A5++,A0
+	 3             LDH    *A6++,A1
+	 4             NOP    4
+	 5             MPY    A0,A1,A3
+	 6             NOP
+	 7             ADD    A3,A4,A4
+	 8             SUB    A2,1,A2
+	 9     [A2]    B      loop
+	10             NOP    5
+	11             STH    A4,*A7
+      </code>
+
+      <para id="para60">
+	In line 4, we need 4 <code>NOP</code>s because the
+	<code>A1</code> is loaded by the
+	<code>LDH</code> instruction in line 3 with 4 delays.
+	After 4 delays, the value of <code>A1</code> is
+	available to be used in the <code>MPY A0,A1,A3</code>
+	in line 5.  Similarly, we need 5 delays after the
+	<code>[A2] B loop</code> instruction in line 9 to
+	prevent the execution of <code>STH A4,*A7</code>
+	before branching occurs.
+      </para>
+
+      <para id="para61">
+	The C6x Very Large Instruction Word (VLIW) architecture,
+	several instructions are captured and processed
+	simultaneously.  This is referred to as a Fetch Packet (FP).
+	This Fetch Packet allows C6x to fetch eight instructions
+	simultaneously from on-chip memory.  Among the 8 instructions
+	fetched at the same time, multiple of them can be executed at
+	the same time if they do not use same CPU resources at the
+	same time.  Because the CPU has 8 separate functional units,
+	maximum 8 instructions can be executed in parallel, although
+	the type of parallel instructions are limited because they
+	must not conflict each other in using CPU resources.  In
+	assembly listing, parallel instructions are indicated by
+	double pipe symbols (<code>||</code>).  When writing assembly
+	code, by designing code to maximize parallel execution of
+	instructions (through proper functional unit assignments,
+	<foreign>etc.</foreign>) the execution cycle of the code can
+	be reduced.
+      </para>
+    </section>
+
+    <section id="section7">
+      <title>Parallel instructions and constraints</title>
+      <para id="para62">
+	We have seen that C62x CPU has 8 functional units. Each
+	assembly instruction is executed in one of these 8 functional
+	units, and it takes exactly one clock cycle for the
+	execution.  Then, while one instruction is being executed in
+	one of the functional units, what are other 7 functional units
+	doing?  Can other functional units execute other instructions
+	at the same time?
+      </para>
+
+      <para id="para63">
+	The answer is YES.  Thus, the CPU can execute maximum 8
+	instructions in each clock cycle.  The instructions executed
+	in the same clock cycle are called <term>parallel
+	instructions</term>.  Then, what instructions can be executed
+	in parallel?  A short answer is: as far as the parallel
+	instructions do not use the same resource of the CPU, they can
+	be put in parallel.  For example, the following two
+	instructions do not use the same CPU resource and they can be
+	executed in parallel.
+      </para>
+
+      <code display="block" id="idm965952">
+	1           ADD    .L1    A0,A1,A2
+	2    ||     ADD    .L2    B0,B1,B2
+      </code>
+<!--
+      %The parallel instructions are indicated by the pipe symbol \verb+||+
+      %at the beginning of each line.-->
+
+      <section id="sec7.1">
+	<title>Resource constraints</title>
+	<para id="para64">
+	  Then, what are the constraints on the parallel instructions?
+	  Let's look at the resource constraints in more detail.
+	</para>
+
+	<section id="sec7.1.1">
+	  <title>Functional unit constraints</title>
+	  <para id="para65">
+	    This is simple.  Each functional unit can execute only one
+	    instruction per each clock cycle.  In other words,
+	    instructions using the same functional unit cannot be put in
+	    parallel.
+	  </para>
+	</section>
+
+	<section id="sec7.1.2">
+	  <title>Cross paths constraints</title>
+	  <para id="para66">
+	    If you look at the data path diagram of the C62x CPU, there
+	    exists only one cross path from B register file to the
+	    <code>L1</code>, <code>M1</code> and
+	    <code>S1</code> functional units.  This means the
+	    cross path can be used only once per each clock cycle.
+	    Thus, the following parallel instructions are invalid
+	    because the 1x cross path is used for both instructions.
+	  </para>
+
+	  <code display="block" id="idm951904">
+	    1          ADD     .L1x    A0,B1,A2
+	    2   ||     MPY     .M1x    A5,B0,A3
+	  </code>
+
+	  <para id="para67">
+	    The same rule holds for the 2x cross path from the A
+	    register file to the <code>L2</code>,
+	    <code>M2</code> and <code>S2</code>
+	    functional units.
+	  </para>
+	</section>
+
+	<section id="sec7.1.3">
+	  <title>Loads and Stores constraints</title>
+	  <para id="para68">
+	    The <code>D</code> units are used for load and
+	    store instructions.  If you examine the C62x data path
+	    diagram, the addresses for load/store can be obtained from
+	    either A or B side using the multiplexers connecting
+	    crisscross to generate the addresses
+	    <code>DA1</code> and <code>DA2</code>.
+	    Thus, the instructions such as
+	  </para>
+
+	  <code display="block" id="idp4125760">
+	    1          LDW     .D2     *B0, A1
+	  </code>
+
+	  <para id="para69">
+	    is valid.  <emphasis>The functional unit must be on the
+	    same side as the address source register</emphasis>
+	    (address index in <code>B0</code> and therefore
+	    <code>D2</code> above), because
+	    <code>D1</code> and <code>D2</code> units
+	    must receive the addresses from A and B sides,
+	    respectively.
+	  </para>
+
+	  <para id="para70">
+	    Another constraint is that while loading a register in one
+	    register file from memory, you cannot simultaneously store
+	    a register in the same register file to memory.  For
+	    example, the following parallel instructions are invalid:
+	  </para>
+
+	  <code display="block" id="idp4133584">
+	    1          LDW     .D1     *A0, A1
+	    2   ||     STW     .D2     A2, *B0
+	  </code>
+	</section>
+
+	<section id="sec7.1.4">
+	  <title>Constraints on register reads</title>
+	  <para id="para71">
+	    You cannot have more than <emphasis>four</emphasis> reads
+	    from the same register in each clock cycle.  Thus, the
+	    following is invalid:
+	  </para>
+
+	  <code display="block" id="idp4138848">
+	    1          ADD     .L1     A1, A1, A2
+	    2   ||     MPY     .M1     A1, A1, A3
+	    3   ||     SUB     .D1     A1, A4, A5
+	  </code>
+	</section>
+
+	<section id="sec7.1.5">
+	  <title>Constraints on register writes</title>
+	  <para id="para72">
+	    A register cannot be written to more than once in a single
+	    clock cycle.  However, note that the actual writing to
+	    registers may not occur in the same clock cycle during
+	    which the instruction is executed.  For example, the
+	    <code>MPY</code> instruction writes to the
+	    destination register in the next clock cycle.  Thus, the
+	    following is valid:
+	  </para>
+
+	  <code display="block" id="idp4144416">
+	    1	       ADD     .L1     A1, A1, A2
+	    2   ||     MPY     .M1     A1, A1, A2
+	  </code>
+
+	  <para id="para73">
+	    The following two instructions (not parallel) are invalid
+	    (why?):
+	  </para>
+
+	  <code display="block" id="idp4146800">
+	    1          MPY     .M1     A1, A1, A2
+	    2          ADD     .L1     A3, A4, A2
+	  </code>
+
+	  <para id="para74">
+	    Some of these write conflicts are very hard to detect and
+	    not detected by the assembler.  Extra caution should be
+	    exercised with the instructions having nonzero delay
+	    slots.
+	  </para>
+	</section>
+      </section>
+    </section>
+
+    <section id="section8">
+      <title>Ad-Hoc software pipelining</title>
+      <para id="para75">
+	At this point, you might have wondered why the C62x CPU
+	allows parallel instructions and generate so much headache
+	with the resource constraints, especially with the
+	instructions with delay slots.  And, why not just make the
+	<code>MPY</code> instruction take 2 clock cycles to
+	execute so that we can always use the multiplied result
+	after issuing it?
+      </para>
+
+      <para id="para76">
+	The reason is that by executing instructions in parallel, we
+	can reduce the total execution time of the program.  A
+	well-written assembly program executes as many instructions
+	as possible in each clock cycle to implement the desired
+	algorithm.
+      </para>
+
+      <para id="para77">
+	The reason for allowing delay slots is that although it
+	takes 2 clock cycles for an <code>MPY</code>
+	instruction generate the result, we can execute another
+	instruction while waiting for the result.  This way, you can
+	reduce the clock cycles wasted while waiting for the result
+	from slow instructions, thus increasing the overall
+	execution speed.
+      </para>
+
+      <para id="para78">
+	However, how can we put instructions in parallel?  Although
+	there's a systematic way of doing it (we will learn a bit
+	later), at this point you can try to restructure your
+	assembly code to execute as many instructions as possible in
+	parallel.  And, you should try to execute other instructions
+	in the delay slots of those instructions such as
+	<code>MPY</code>, <code>LDW</code>, <foreign>etc.</foreign>,
+	instead of inserting <code>NOP</code>s to wait the
+	instructions produce the results.
+      </para>
+
+      <exercise id="ex10">
+	<problem id="idp1750592">
+	  <para id="ex10q">
+	    (parallel instructions):  Modify your assembly program
+	    for the inner product computation in the previous
+	    exercise to use parallel instructions as much as
+	    possible.  Also, try to fill the delay slots as much as
+	    possible.  Using the code composer's profiling, compare
+	    the clock cycles necessary for executing the modified
+	    program.  How many clock cycles could you save?
+	  </para>
+	</problem>
+	<solution id="idp1752992">
+	  <para id="ex10s">
+	    Intentionally left blank.
+	  </para>
+	</solution>
+      </exercise>
+    </section>
+  </content>
+  
+</document>

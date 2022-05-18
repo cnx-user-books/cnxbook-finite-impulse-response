@@ -1,0 +1,1244 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Fixed Point Arithmetic</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>a653e310-aa21-4a16-8cf0-9aff9f74f30a</md:uuid>
+</metadata>
+
+
+  <content>
+    <section id="sec1">
+      <title>Fixed-point arithmetic</title>
+      <para id="para1">
+	This handout explains how numbers are represented in the fixed
+	point TI C6211 DSP processor.  Because hardware can only store
+	and process <emphasis>bits</emphasis>, all the numbers must be
+	represented as a collection of bits.  Each bit represents
+	either "0" or "1", hence the number system naturally used in
+	microprocessors is the binary system.  This handout explains
+	how numbers are represented and processed in DSP processors
+	for implementing DSP algorithms.
+      </para>
+
+      <section id="sec1.1">
+	<title>How numbers are represented</title>
+	<para id="para2">
+	  A collection of <m:math><m:ci>N</m:ci></m:math> binary
+	  digits (bits) has 
+	  <m:math>
+	    <m:apply>
+	      <m:power/>
+	      <m:cn>2</m:cn>
+	      <m:ci>N</m:ci>
+	    </m:apply>
+	  </m:math> possible states.  This can be seen from elementary
+	  counting theory, which tells us that there are two
+	  possibilities for the first bit, two possibilities for the
+	  next bit, and so on until the last bit, resulting in
+
+	  <m:math display="block">
+	    <m:apply>
+	      <m:eq/>
+	      <m:apply>
+		<m:times/>
+		<m:cn>2</m:cn>
+		<m:cn>2</m:cn>
+		<m:cn>2</m:cn>
+		<m:ci>…</m:ci>
+	      </m:apply>
+	      <m:apply>
+		<m:power/>
+		<m:cn>2</m:cn>
+		<m:ci>N</m:ci>
+	      </m:apply>
+	    </m:apply>
+	  </m:math>
+
+	  possibilities or states.  In the most general sense, we can
+	  allow these states to represent anything conceivable. The
+	  point is that there is no meaning inherent in a binary word,
+	  although most people are tempted to think of them as
+	  positive integers.  However, the meaning of an
+	  <m:math><m:ci>N</m:ci></m:math>-bit binary word depends
+	  entirely on its <emphasis>interpretation</emphasis>.
+	</para>
+
+	<section id="sec1.1.1">
+	  <title>Unsigned integer representation</title>
+	  <para id="para3">
+	    The <term>natural binary</term> representation interprets
+	    each binary word as a positive integer.  For example, we
+	    interpret an 8-bit binary word
+	    <m:math display="block">
+	      <m:ci>
+		<m:mrow>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>7</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>6</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>5</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>4</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>3</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>2</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>1</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>0</m:mn>
+		  </m:msub>
+		</m:mrow>
+	      </m:ci>
+	    </m:math>
+	    as an integer
+	    <m:math display="block">
+	      <m:apply>
+		<m:eq/>
+		<m:ci>x</m:ci>
+		<m:apply>
+		  <m:plus/>
+		  <m:apply>
+		    <m:times/>
+		    <m:ci><m:msub>
+			<m:mi>b</m:mi>
+			<m:mn>7</m:mn>
+		      </m:msub></m:ci>
+		    <m:apply>
+		      <m:power/>
+		      <m:cn>2</m:cn>
+		      <m:cn>7</m:cn>
+		    </m:apply>
+		  </m:apply>
+		  <m:apply>
+		    <m:times/>
+		    <m:ci><m:msub>
+			<m:mi>b</m:mi>
+			<m:mn>6</m:mn>
+		      </m:msub></m:ci>
+		    <m:apply>
+		      <m:power/>
+		      <m:cn>2</m:cn>
+		      <m:cn>6</m:cn>
+		    </m:apply>
+		  </m:apply>
+		  <m:ci>…</m:ci>
+		  <m:apply>
+		    <m:times/>
+		    <m:ci><m:msub>
+			<m:mi>b</m:mi>
+			<m:mn>1</m:mn>
+		      </m:msub></m:ci>
+		    <m:cn>2</m:cn>
+		  </m:apply>
+		  <m:ci><m:msub>
+		      <m:mi>b</m:mi>
+		      <m:mn>0</m:mn>
+		    </m:msub></m:ci>
+		</m:apply>
+
+		<m:apply>
+		  <m:sum/>
+		  <m:bvar><m:ci>i</m:ci></m:bvar>
+		  <m:lowlimit><m:cn>0</m:cn></m:lowlimit>
+		  <m:uplimit><m:cn>7</m:cn></m:uplimit>
+		  <m:apply>
+		    <m:times/>
+		    <m:apply>
+		      <m:power/>
+		      <m:cn>2</m:cn>
+		      <m:ci>i</m:ci>
+		    </m:apply>
+		    <m:ci><m:msub>
+			<m:mi>b</m:mi>
+			<m:mi>i</m:mi>
+		      </m:msub></m:ci>
+		  </m:apply>
+		</m:apply>
+	      </m:apply>
+	    </m:math>
+	    This way, an <m:math><m:ci>N</m:ci></m:math>-bit binary
+	    word corresponds to an integer between
+	    <m:math><m:cn>0</m:cn></m:math> and
+	    <m:math>
+	      <m:apply>
+		<m:minus/>
+		<m:apply>
+		  <m:power/>
+		  <m:cn>2</m:cn>
+		  <m:ci>N</m:ci>
+		</m:apply>
+		<m:cn>1</m:cn>
+	      </m:apply>
+	    </m:math>.  Conversely, all the integers in this range can
+	    be represented by an <m:math><m:ci>N</m:ci></m:math>-bit
+	    binary word.  We call this interpretation of binary words
+	    <term>unsigned integer</term> representation, because each
+	    word corresponds to a positive (or unsigned) integer.
+	  </para>
+
+	  <para id="para4">
+	    We can add and multiply two binary words in a straightforward
+	    fashion.  Because all the numbers are positive, the results of
+	    addition or multiplication are also positive.
+	  </para>
+
+	  <para id="para5">
+	    However, the result of adding two
+	    <m:math><m:ci>N</m:ci></m:math>-bit words in general results
+	    in an 
+	    <m:math>
+	      <m:apply>
+		<m:plus/>
+		<m:ci>N</m:ci>
+		<m:cn>1</m:cn>
+	      </m:apply>
+	    </m:math> bits.  When the result cannot be represented as an
+	    <m:math><m:ci>N</m:ci></m:math>-bit word, we say that an
+	    <term>overflow</term> has occurred.  In general, the result of
+	    multiplying two <m:math><m:ci>N</m:ci></m:math>-bit words is a 
+	    <m:math>
+	      <m:apply>
+		<m:times/>
+		<m:cn>2</m:cn>
+		<m:ci>N</m:ci>
+	      </m:apply>
+	    </m:math> bit word.  Note that as we multiply numbers
+	    together, the number of necessary bits increases
+	    indefinitely.  This is undesirable in DSP algorithms
+	    implemented on hardware.  So, <link target-id="sec1.1.3" strength="3">later</link> we will introduce the fractional
+	    interpretation of binary words, to overcome this problem.
+	  </para>
+
+	  <para id="para6">
+	    Another problem of the unsigned integer representation is
+	    that it can only represent positive integers.  To
+	    represent negative values, naturally we need a different
+	    interpretation of binary words, and we introduce the
+	    <term>two's complement</term> representation and
+	    corresponding operations to implement arithmetic on the
+	    numbers represented in the two's complement format.
+	  </para>
+	</section>
+
+	<section id="sec1.1.2">
+	  <title>Two's complement integer representation</title>
+	  <para id="para7">
+	    Using the natural binary representation, an
+	    <m:math><m:ci>N</m:ci></m:math>-bit word can represent
+	    integers from <m:math><m:cn>0</m:cn></m:math> to 
+	    <m:math>
+	      <m:apply>
+		<m:minus/>
+		<m:apply>
+		  <m:power/>
+		  <m:cn>2</m:cn>
+		  <m:ci>N</m:ci>
+		</m:apply>
+		<m:cn>1</m:cn>
+	      </m:apply>
+	    </m:math>.  However, to represent negative numbers as well
+	    as positive integers, we can use the <term>two's
+	    complement</term> representation.  In 2's complement
+	    representation, an <m:math><m:ci>N</m:ci></m:math>-bit
+	    word represents integers from
+	    <m:math>
+	      <m:apply>
+		<m:power/>
+		<m:apply>
+		  <m:minus/>
+		  <m:cn>2</m:cn>
+		</m:apply>
+		<m:apply>
+		  <m:minus/>
+		  <m:ci>N</m:ci>
+		  <m:cn>1</m:cn>
+		</m:apply>
+	      </m:apply>
+	    </m:math> to 
+	    <m:math>
+	      <m:apply>
+		<m:minus/>
+		<m:apply>
+		  <m:power/>
+		  <m:cn>2</m:cn>
+		  <m:apply>
+		    <m:minus/>
+		    <m:ci>N</m:ci>
+		    <m:cn>1</m:cn>
+		  </m:apply>
+		</m:apply>
+		<m:cn>1</m:cn>
+	      </m:apply>
+	    </m:math>.
+	  </para>
+
+	  <para id="para8">
+	    For example, we interpret an 8-bit binary word
+	    <m:math display="block">
+	      <m:ci>
+		<m:mrow>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>7</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>6</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>5</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>4</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>3</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>2</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>1</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>0</m:mn>
+		  </m:msub>
+		</m:mrow>
+	      </m:ci>
+	    </m:math>
+	    as an integer
+	    <m:math display="block">
+	      <m:apply>
+		<m:eq/>
+		<m:ci>x</m:ci>
+		<m:apply>
+		  <m:plus/>
+		  <m:apply>
+		    <m:minus/>
+		    <m:apply>
+		      <m:times/>
+		      <m:ci><m:msub>
+			  <m:mi>b</m:mi>
+			  <m:mn>7</m:mn>
+			</m:msub></m:ci>
+		      <m:apply>
+			<m:power/>
+			<m:cn>2</m:cn>
+			<m:cn>7</m:cn>
+		      </m:apply>
+		    </m:apply>
+		  </m:apply>
+		  <m:apply>
+		    <m:times/>
+		    <m:ci><m:msub>
+			<m:mi>b</m:mi>
+			<m:mn>6</m:mn>
+		      </m:msub></m:ci>
+		    <m:apply>
+		      <m:power/>
+		      <m:cn>2</m:cn>
+		      <m:cn>6</m:cn>
+		    </m:apply>
+		  </m:apply>
+		  <m:ci>…</m:ci>
+		  <m:apply>
+		    <m:times/>
+		    <m:ci><m:msub>
+			<m:mi>b</m:mi>
+			<m:mn>1</m:mn>
+		      </m:msub></m:ci>
+		    <m:cn>2</m:cn>
+		  </m:apply>
+		  <m:ci><m:msub>
+		      <m:mi>b</m:mi>
+		      <m:mn>0</m:mn>
+		    </m:msub></m:ci>
+		</m:apply>
+
+		<m:apply>
+		  <m:plus/>
+		  <m:apply>
+		    <m:minus/>
+		    <m:apply>
+		      <m:times/>
+		      <m:ci><m:msub>
+			  <m:mi>b</m:mi>
+			  <m:mn>7</m:mn>
+			</m:msub></m:ci>
+		      <m:apply>
+			<m:power/>
+			<m:cn>2</m:cn>
+			<m:cn>7</m:cn>
+		      </m:apply>
+		    </m:apply>
+		  </m:apply>
+		  <m:apply>
+		    <m:sum/>
+		    <m:bvar><m:ci>i</m:ci></m:bvar>
+		    <m:lowlimit><m:cn>0</m:cn></m:lowlimit>
+		    <m:uplimit><m:cn>6</m:cn></m:uplimit>
+		    <m:apply>
+		      <m:times/>
+		      <m:apply>
+			<m:power/>
+			<m:cn>2</m:cn>
+			<m:ci>i</m:ci>
+		      </m:apply>
+		      <m:ci><m:msub>
+			  <m:mi>b</m:mi>
+			  <m:mi>i</m:mi>
+			</m:msub></m:ci>
+		    </m:apply>
+		  </m:apply>
+		</m:apply>
+	      </m:apply>
+	    </m:math>
+
+	    in the 2's complement representation, and
+	    <m:math><m:ci>x</m:ci></m:math> ranges from 
+	    <m:math><m:cn>-128</m:cn></m:math> (
+	    <m:math>
+	      <m:apply>
+		<m:minus/>
+		<m:apply>
+		  <m:power/>
+		  <m:cn>2</m:cn>
+		  <m:cn>7</m:cn>
+		</m:apply>
+	      </m:apply>
+	    </m:math>) to <m:math><m:cn>127</m:cn></m:math> (
+	    <m:math>
+	      <m:apply>
+		<m:minus/>
+		<m:apply>
+		  <m:power/>
+		  <m:cn>2</m:cn>
+		  <m:cn>7</m:cn>
+		</m:apply>
+		<m:cn>1</m:cn>
+	      </m:apply>
+	    </m:math>).  Several examples:
+	  </para>
+
+	  <table frame="all" id="table1" summary="">
+	    <tgroup cols="2">
+	      <thead>
+		<row>
+		  <entry>binary</entry>
+		  <entry>decimal</entry>
+		</row>
+	      </thead>
+	      <tbody>
+		<row>
+		  <entry><code>00000000</code></entry>
+		  <entry align="right">0</entry>
+		</row>
+		<row>
+		  <entry><code>00000001</code></entry>
+		  <entry align="right">1</entry>
+		</row>
+		<row>
+		  <entry><code>01000000</code></entry>
+		  <entry align="right">64</entry>
+		</row>
+		<row>
+		  <entry><code>01111111</code></entry>
+		  <entry align="right">127</entry>
+		</row>
+		<row>
+		  <entry><code>10000000</code></entry>
+		  <entry align="right">-128</entry>
+		</row>
+		<row>
+		  <entry><code>10000001</code></entry>
+		  <entry align="right">-127</entry>
+		</row>
+		<row>
+		  <entry><code>11000000</code></entry>
+		  <entry align="right">-64</entry>
+		</row>
+		<row>
+		  <entry><code>11111111</code></entry>
+		  <entry align="right">-1</entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </table>
+
+	  <para id="para9">
+	    When <m:math><m:ci>x</m:ci></m:math> is a positive (negative)
+	    number in 2's complement format,
+	    <m:math>
+	      <m:apply>
+		<m:minus/>
+		<m:ci>x</m:ci>
+	      </m:apply>
+	    </m:math> can be found by inverting each bit and adding
+	    <m:math><m:cn>1</m:cn></m:math>.  For example,
+	    <m:math><m:cn base="2">01000000</m:cn></m:math> is
+	    <m:math><m:cn>64</m:cn></m:math> in decimal and
+	    <m:math><m:cn>-64</m:cn></m:math> is found by first
+	    inverting the bits to obtain <m:math><m:cn base="2">10111111</m:cn></m:math> and adding
+	    <m:math><m:cn>1</m:cn></m:math>, thus
+	    <m:math><m:cn>-64</m:cn></m:math> is <m:math><m:cn base="2">11000000</m:cn></m:math> as shown in the above
+	    table.  Because the MSB indicates the sign of the number
+	    represented by the binary word, we call this bit the
+	    <term>sign bit</term>.  If the sign bit is 0, the word
+	    represents positive number, while negative numbers have 1
+	    as the sign bit.
+	  </para>
+
+	  <para id="para10">
+	    In 2's compliment representation, subtraction of two
+	    integers can be accomplished by usual binary summation by
+	    computing 
+	    <m:math>
+	      <m:apply>
+		<m:minus/>
+		<m:ci>x</m:ci>
+		<m:ci>y</m:ci>
+	      </m:apply>
+	    </m:math> as 
+	    <m:math>
+	      <m:apply>
+		<m:plus/>
+		<m:ci>x</m:ci>
+		<m:apply>
+		  <m:minus/>
+		  <m:ci>y</m:ci>
+		</m:apply>
+	      </m:apply>
+	    </m:math>.  We investigate the operations on the 2's
+	    compliment numbers <link target-id="sec2" strength="3">later</link>.  However, when you add two 2's
+	    complement numbers, you must keep in mind that the 1 in
+	    MSB is actually -1.
+	  </para>
+
+	  <exercise id="ex1">
+	    <problem id="idp5996256">
+	      <para id="para11">
+		(2's complement): What are the decimal numbers
+		corresponding to the 2's complement 8-bit binary
+		numbers; <m:math><m:cn base="2">01001101</m:cn></m:math>, <m:math><m:cn base="2">11100100</m:cn></m:math>, <m:math><m:cn base="2">01111001</m:cn></m:math>, and <m:math><m:cn base="2">10001011</m:cn></m:math>?
+	      </para>
+	    </problem>
+	    <solution id="idm346752">
+	      <para id="ex1s">
+		Intentionally left blank.
+	      </para>
+	    </solution>
+	  </exercise>
+
+	  <para id="para12">
+	    Sometimes, you need to convert an 8-bit 2's complement number
+	    to a 16-bit number.  What is the 16-bit 2's complement
+	    number representing the same value as the 8-bit numbers
+	    <m:math><m:cn base="2">01001011</m:cn></m:math> and
+	    <m:math><m:cn base="2">10010111</m:cn></m:math>?  The answer
+	    is <m:math><m:cn base="2">0000000001001000</m:cn></m:math>
+	    and <m:math><m:cn base="2">1111111110010111</m:cn></m:math>.
+	    For nonnegative numbers (sign bit = 0), you simply add
+	    enough 0's to extend the number of bits.  For negative
+	    numbers, you add enough 1's.  This operation is called
+	    <term>sign extension</term>.  The same rule holds for
+	    extending a 16-bit 2's complement number to a 32-bit number.
+	  </para>
+
+	  <para id="para13">
+	    For the arithmetic assembly instructions, C62x CPU has
+	    different versions depending on how it handles the signs.
+	    For example, the load instructions <code>LDH</code>
+	    and <code>LDB</code> load halfword and byte value to
+	    a 32-bit register with sign extension.  That is, the loaded
+	    values are converted to 32-bit 2's complement number and
+	    loaded into a register.  The instructions
+	    <code>LDHU</code> and <code>LDBU</code> do
+	    not perform sign extension.  They simply fill zeros for the
+	    upper 16- and 24-bits, respectively.
+	  </para>
+
+	  <para id="para14">
+	    For the shift right instructions <code>SHR</code>
+	    and <code>SHRU</code>, the same rule applies.  The
+	    <code>ADDU</code> instruction simply treats the
+	    operands as unsigned values.
+	  </para>
+	</section>
+
+	<section id="sec1.1.3">
+	  <title>Fractional representation</title>
+	  <para id="para15">
+	    Although using 2's compliment integers we can implement both
+	    addition and subtraction by usual binary addition (with
+	    special care for the sign bit), the integers are not
+	    convenient to handle to implement DSP algorithms.  For
+	    example, If we multiply two 8-bit words together, we need 16
+	    bits to store the result.  The number of required word
+	    length increases without bound as we multiply numbers
+	    together more.  Although not impossible, it is complicated
+	    to handle this increase in word-length using integer
+	    arithmetic.  The problem can be easily handled by using
+	    numbers between <m:math><m:cn>-1</m:cn></m:math> and
+	    <m:math><m:cn>1</m:cn></m:math>, instead of integers,
+	    because the product of two numbers in 
+	    <m:math>
+	      <m:interval>
+		<m:cn>-1</m:cn>
+		<m:cn>1</m:cn>
+	      </m:interval>
+	    </m:math> are always in the same range.
+	  </para>
+
+	  <para id="para16">
+	    In the 2's complement fractional representation, an
+	    <m:math><m:ci>N</m:ci></m:math> bit binary word can
+	    represent 
+	    <m:math>
+	      <m:apply>
+		<m:power/>
+		<m:cn>2</m:cn>
+		<m:ci>N</m:ci>
+	      </m:apply>
+	    </m:math> equally space numbers from 
+	    <m:math>
+	      <m:apply>
+		<m:eq/>
+		<m:apply>
+		  <m:divide/>
+		  <m:apply>
+		    <m:power/>
+		    <m:apply>
+		      <m:minus/>
+		      <m:cn>2</m:cn>
+		    </m:apply>
+		    <m:apply>
+		      <m:minus/>
+		      <m:ci>N</m:ci>
+		      <m:cn>1</m:cn>
+		    </m:apply>
+		  </m:apply>
+		  <m:apply>
+		    <m:power/>
+		    <m:cn>2</m:cn>
+		    <m:apply>
+		      <m:minus/>
+		      <m:ci>N</m:ci>
+		      <m:cn>1</m:cn>
+		    </m:apply>
+		  </m:apply>
+		</m:apply>
+		<m:cn>1</m:cn>
+	      </m:apply>
+	    </m:math> to 
+
+	    <m:math>
+	      <m:apply>
+		<m:eq/>
+		<m:apply>
+		  <m:divide/>
+		  <m:apply>
+		    <m:power/>
+		    <m:cn>2</m:cn>
+		    <m:apply>
+		      <m:minus/>
+		      <m:apply>
+			<m:minus/>
+			<m:ci>N</m:ci>
+			<m:cn>1</m:cn>
+		      </m:apply>
+		    </m:apply>
+		    <m:cn>1</m:cn>
+		  </m:apply>
+		  <m:apply>
+		    <m:power/>
+		    <m:cn>2</m:cn>
+		    <m:apply>
+		      <m:minus/>
+		      <m:ci>N</m:ci>
+		      <m:cn>1</m:cn>
+		    </m:apply>
+		  </m:apply>
+		</m:apply>
+		<m:apply>
+		  <m:minus/>
+		  <m:cn>1</m:cn>
+		  <m:apply>
+		    <m:power/>
+		    <m:cn>2</m:cn>
+		    <m:apply>
+		      <m:minus/>
+		      <m:ci>N</m:ci>
+		      <m:cn>1</m:cn>
+		    </m:apply>
+		  </m:apply>
+		</m:apply>
+	      </m:apply>
+	    </m:math>.
+	  </para>
+
+	  <para id="para17">
+	    For example, we interpret an 8-bit binary word
+	    <m:math display="block">
+	      <m:ci>
+		<m:mrow>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>7</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>6</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>5</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>4</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>3</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>2</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>1</m:mn>
+		  </m:msub>
+		  <m:msub>
+		    <m:mi>b</m:mi>
+		    <m:mn>0</m:mn>
+		  </m:msub>
+		</m:mrow>
+	      </m:ci>
+	    </m:math>
+	    as a fractional number 
+	    <m:math display="block">
+	      <m:apply>
+		<m:eq/>
+		<m:ci>x</m:ci>
+		<m:apply>
+		  <m:divide/>
+		  <m:apply>
+		    <m:plus/>
+		    <m:apply>
+		      <m:minus/>
+		      <m:apply>
+			<m:times/>
+			<m:ci><m:msub>
+			    <m:mi>b</m:mi>
+			    <m:mn>7</m:mn>
+			  </m:msub></m:ci>
+			<m:apply>
+			  <m:power/>
+			  <m:cn>2</m:cn>
+			  <m:cn>7</m:cn>
+			</m:apply>
+		      </m:apply>
+		    </m:apply>
+		    <m:apply>
+		      <m:times/>
+		      <m:ci><m:msub>
+			  <m:mi>b</m:mi>
+			  <m:mn>6</m:mn>
+			</m:msub></m:ci>
+		      <m:apply>
+			<m:power/>
+			<m:cn>2</m:cn>
+			<m:cn>6</m:cn>
+		      </m:apply>
+		    </m:apply>
+		    <m:ci>…</m:ci>
+		    <m:apply>
+		      <m:times/>
+		      <m:ci><m:msub>
+			  <m:mi>b</m:mi>
+			  <m:mn>1</m:mn>
+			</m:msub></m:ci>
+		      <m:cn>2</m:cn>
+		    </m:apply>
+		    <m:ci><m:msub>
+			<m:mi>b</m:mi>
+			<m:mn>0</m:mn>
+		      </m:msub></m:ci>
+		  </m:apply>
+		  <m:apply>
+		    <m:power/>
+		    <m:cn>2</m:cn>
+		    <m:cn>7</m:cn>
+		  </m:apply>
+		</m:apply>
+
+		<m:apply>
+		  <m:in/>
+		  <m:apply>
+		    <m:plus/>
+		    <m:apply>
+		      <m:minus/>
+		      <m:apply>
+			<m:times/>
+			<m:ci><m:msub>
+			    <m:mi>b</m:mi>
+			    <m:mn>7</m:mn>
+			  </m:msub></m:ci>
+		      </m:apply>
+		    </m:apply>
+		    <m:apply>
+		      <m:sum/>
+		      <m:bvar><m:ci>i</m:ci></m:bvar>
+		      <m:lowlimit><m:cn>0</m:cn></m:lowlimit>
+		      <m:uplimit><m:cn>6</m:cn></m:uplimit>
+		      <m:apply>
+			<m:times/>
+			<m:apply>
+			  <m:power/>
+			  <m:cn>2</m:cn>
+			  <m:apply>
+			    <m:minus/>
+			    <m:ci>i</m:ci>
+			    <m:cn>7</m:cn>
+			  </m:apply>
+			</m:apply>
+			<m:ci><m:msub>
+			    <m:mi>b</m:mi>
+			    <m:mi>i</m:mi>
+			  </m:msub></m:ci>
+		      </m:apply>
+		    </m:apply>
+		  </m:apply>
+		  <m:interval>
+		    <m:cn>-1</m:cn>
+		    <m:apply>
+		      <m:minus/>
+		      <m:cn>1</m:cn>
+		      <m:apply>
+			<m:power/>
+			<m:cn>2</m:cn>
+			<m:cn>-7</m:cn>
+		      </m:apply>
+		    </m:apply>
+		  </m:interval>
+		</m:apply>
+	      </m:apply>
+	    </m:math>
+	  </para>
+
+	  <para id="para18">
+	    This representation is also referred as
+	    <term>Q-format</term>.  We can think of having an implied
+	    binary digit right after the MSB.  If we have an
+	    <m:math><m:ci>N</m:ci></m:math>-bit binary word with MSB as
+	    the sign bit, we have 
+	    <m:math>
+	      <m:apply>
+		<m:minus/>
+		<m:ci>N</m:ci>
+		<m:cn>1</m:cn>
+	      </m:apply>
+	    </m:math> bits to represent the fraction.  We say the number
+	    has Q-(
+	    <m:math>
+	      <m:apply>
+		<m:minus/>
+		<m:ci>N</m:ci>
+		<m:cn>1</m:cn>
+	      </m:apply>
+	    </m:math>) format.  For example, in the example,
+	    <m:math><m:ci>x</m:ci></m:math> is a Q-7 number.  In C6211,
+	    it is easiest to handle Q-15 numbers represented by each 16
+	    bit binary word, because the multiplication of two Q-15
+	    numbers results in a Q-30 number that can still be stored in
+	    a 32-bit wide register of C6211.  The programmer needs to
+	    keep track of the implied binary point when manipulating
+	    Q-format numbers.
+	  </para>
+
+	  <exercise id="ex2">
+	    <problem id="idp588304">
+	      <para id="para19">
+		(Q format): What are the decimal fractional numbers
+		corresponding to the Q-7 format binary numbers;
+		<m:math><m:cn base="2">01001101</m:cn></m:math>,
+		<m:math><m:cn base="2">11100100</m:cn></m:math>,
+		<m:math><m:cn base="2">01111001</m:cn></m:math>, and
+		<m:math><m:cn base="2">10001011</m:cn></m:math>?
+	      </para>
+	    </problem>
+	    <solution id="idp5680368">
+	      <para id="ex2s">
+		Intentionally left blank.
+	      </para>
+	    </solution>
+	  </exercise>
+	</section>
+      </section>
+
+      <section id="sec2">
+	<title>Two's complement arithmetic</title>
+	<para id="para20">
+	  The convenience of 2's compliment format comes from the
+	  ability to represent negative numbers and compute
+	  subtraction using the same algorithm as a binary addition.
+	  The C62x processor has instructions to add, subtract and
+	  multiply numbers in the 2's compliment format.  Because, in
+	  most digital signal processing algorithms, Q-15 format is
+	  most easy to implement on C62x processors, we only focus on
+	  the arithmetic operations on Q-15 numbers in the following.
+	</para>
+
+	<section id="sec2.1">
+	  <title>Addition and subtraction</title>
+	  <para id="para21">
+	    The addition of two binary numbers is computed in the
+	    same way as we compute the sum of two decimal numbers.
+	    Using the relation 
+	    <m:math>
+	      <m:apply>
+		<m:eq/>
+		<m:apply>
+		  <m:plus/>
+		  <m:cn>0</m:cn>
+		  <m:cn>0</m:cn>
+		</m:apply>
+		<m:cn>0</m:cn>
+	      </m:apply>
+	    </m:math>, 
+	    <m:math>
+	      <m:apply>
+		<m:eq/>
+		<m:apply>
+		  <m:plus/>
+		  <m:cn>0</m:cn>
+		  <m:cn>1</m:cn>
+		</m:apply>
+		<m:apply>
+		  <m:plus/>
+		  <m:cn>1</m:cn>
+		  <m:cn>0</m:cn>
+		</m:apply>
+		<m:cn>1</m:cn>
+	      </m:apply>
+	    </m:math> and 
+	    <m:math>
+	      <m:apply>
+		<m:eq/>
+		<m:apply>
+		  <m:plus/>
+		  <m:cn>1</m:cn>
+		  <m:cn>1</m:cn>
+		</m:apply>
+		<m:cn>10</m:cn>
+	      </m:apply>
+	    </m:math>, we can easily compute the sum of two binary
+	    numbers.  The C62x instruction <code>ADD</code>
+	    performs this binary addition on different operands.
+	  </para>
+
+	  <para id="para22">
+	    However, care must be taken when adding binary numbers.
+	    Because each Q-15 number can represent numbers in the
+	    range 
+	    <m:math>
+	      <m:interval>
+		<m:cn>-1</m:cn>
+		<m:apply>
+		  <m:minus/>
+		  <m:cn>1</m:cn>
+		  <m:apply>
+		    <m:power/>
+		    <m:cn>2</m:cn>
+		    <m:cn>15</m:cn>
+		  </m:apply>
+		</m:apply>
+	      </m:interval>
+	    </m:math>, if the result of summing two Q-15 numbers is
+	    not in this range, we cannot represent the result in the
+	    Q-15 format.  When this happens, we say an
+	    <term>overflow</term> has occurred.  Unless carefully
+	    handled, the overflow makes the result incorrect.
+	    Therefore, it is really important to prevent overflows
+	    from occurring when implementing DSP algorithms.  One way
+	    of avoiding overflow is to scale all the numbers down by a
+	    constant factor, effectively making all the numbers very
+	    small, so that any summation would give results in the
+	    <m:math>
+	      <m:interval closure="closed-open">
+		<m:cn>-1</m:cn>
+		<m:cn>1</m:cn>
+	      </m:interval>
+	    </m:math> range.  This <emphasis>scaling</emphasis> is
+	    necessary and it is important to figure out how much
+	    scaling is necessary to avoid overflow.  Because scaling
+	    results in loss of effective number of digits, increasing
+	    quantization errors, we usually need to find the minimum
+	    amount of scaling to prevent overflow.
+	  </para>
+
+	  <para id="para23">
+	    Another way of handling the overflow (and underflow) is 
+	    <term>saturation</term>.  If the result is out of the
+	    range that can be properly represented in the given data
+	    size, the value is saturated, meaning that the value
+	    closest to the true result is taken in the range
+	    representable.  Such instructions as
+	    <code>SADD</code>, <code>SSUB</code>
+	    perform the operations followed by saturation.
+	  </para>
+
+	  <exercise id="ex3">
+	    <problem id="idm222896">
+	      <para id="para24">
+		(Q format addition, subtraction): Perform the
+		additions 
+		<m:math>
+		  <m:apply>
+		    <m:plus/>
+		    <m:cn base="2">01001101</m:cn>
+		    <m:cn base="2">11100100</m:cn>
+		  </m:apply>
+		</m:math>, and 
+		<m:math>
+		  <m:apply>
+		    <m:plus/>
+		    <m:cn base="2">01111001</m:cn>
+		    <m:cn base="2">10001011</m:cn>
+		  </m:apply>
+		</m:math>
+		when the binary numbers are Q-7 format.  Also compute
+		<m:math>
+		  <m:apply>
+		    <m:minus/>
+		    <m:cn base="2">01001101</m:cn>
+		    <m:cn base="2">11100100</m:cn>
+		  </m:apply>
+		</m:math> and 
+		<m:math>
+		  <m:apply>
+		    <m:minus/>
+		    <m:cn base="2">10001011</m:cn>
+		    <m:cn base="2">00110111</m:cn>
+		  </m:apply>
+		</m:math>.  In which cases, do you have overflow?
+	      </para>
+	    </problem>
+	    <solution id="idm554368">
+	      <para id="ex3s">
+		Intentionally left blank.
+	      </para>
+	    </solution>
+	  </exercise>
+	</section>
+
+	<section id="sec2.2">
+	  <title>Multiplication</title>
+	  <para id="para25">
+	    Multiplication of two 2's complement numbers is a bit
+	    complicated because of the sign bit.  Similar to the
+	    multiplication of two decimal fractional numbers, the
+	    result of multiplying two
+	    Q-<m:math><m:ci>N</m:ci></m:math> numbers is Q-<m:math>
+	      <m:apply>
+		<m:times/>
+		<m:cn>2</m:cn>
+		<m:ci>N</m:ci>
+	      </m:apply>
+	    </m:math>, meaning
+	    that we have 
+	    <m:math>
+	      <m:apply>
+		<m:times/>
+		<m:cn>2</m:cn>
+		<m:ci>N</m:ci>
+	      </m:apply>
+	    </m:math> binary digits following the implied binary
+	    digit.  However, depending on the numbers multiplied, the
+	    result can have either 1 or 2 binary digits before the
+	    binary point.  We call the digit right before the binary
+	    point the <term>sign bit</term> and the one proceeding the
+	    sign bit (if any) the <term>extended sign bit</term>.
+	  </para>
+
+	  <para id="para26">
+	    The following is the two examples of binary fractional
+	    multiplications:
+	  </para>
+
+	  <code display="block" id="idp13108112">
+			0.110	0.75 Q-3
+		X	1.110	-0.25 Q-3
+		--------------------------
+			 0000
+			0110
+		       0110
+		      1010
+	       -------------------------------
+		      1110100	-0.1875 Q-6
+	  </code>
+
+	  <para id="para27">
+	    Above, all partial products are computed and represented
+	    in Q-6 format for summation.  For example,
+	    <code>0.110*0.010 =0.01100</code> in Q-6 for the
+	    second partial product.  For the 4th partial product, care
+	    must be taken because in <code>0.110*1.000</code>,
+	    <code>1.000</code> represents
+	    <m:math><m:cn>-1</m:cn></m:math>, so the product is
+	    <code>-0.110 = 1.01000</code> (in Q-6 format) that
+	    is 2's complement of <code>0.11000</code>.  As
+	    noticed in this example, it is important to represent each
+	    partial product in Q-6 (or in general Q-
+	    <m:math>
+	      <m:apply>
+		<m:times/>
+		<m:cn>2</m:cn>
+		<m:ci>N</m:ci>
+	      </m:apply>
+	    </m:math>) format before adding them together.  Another
+	    example makes this point clearer:
+	  </para>
+
+	  <code display="block" id="idm485392">
+			1.110	-0.25 Q-3
+		X	0.110	0.75 Q-3
+		-------------------------	
+			 0000
+		      111110
+		      11110
+		      0000
+	       -----------------------------
+		     11110100	-0.1875 Q-6
+	  </code>
+
+	  <para id="para28">
+	    For the second partial product, we need
+	    <code>1.110*0.010</code> in Q-6 format.  This is
+	    obtained as <code>1111100</code> in Q-6 (check!).
+	    A simple way to obtain it is to first perform the
+	    multiplication in normal fashion as <code>1110*0010 =
+	    11100</code> ignoring the binary points, then perform
+	    <emphasis>sign extension</emphasis> by putting enough 1s
+	    (if the result is negative) or 0s (if the result is
+	    nonnegative), then put the binary point to obtain a Q-6
+	    number.  Also notice that we need to remove the extra sign
+	    bit to obtain the final result.
+	  </para>
+
+	  <para id="para29">
+	    In C62x, if we multiply two Q-15 numbers using one of
+	    multiply instruction (for example
+	    <code>MPY</code>), we obtain 32 bit result in Q-30
+	    format with 2 sign bits.  To obtain the result back in
+	    Q-15 format, (i) first we remove 15 trailing bits and (ii)
+	    remove the extended sign bit.
+	  </para>
+
+	  <exercise id="ex4">
+	    <problem id="idp9320384">
+	      <para id="para30">
+		(Q format multiplication): Perform the multiplications
+		<code>01001101*11100100</code>, and
+		<code>01111001*10001011</code> when the binary
+		numbers are Q-7 format.
+	      </para>
+	    </problem>
+	    <solution id="idp8704800">
+	      <para id="ex4s">
+		Intentionally left blank.
+	      </para>
+	    </solution>
+	  </exercise>
+	</section>
+      </section>
+
+      <section id="sec3">
+	<title>Assembly language implementation</title>
+	<para id="para31">
+	  When <code>A0</code> and <code>A1</code>
+	  contain two 16-bit numbers in the Q-15 format, we can
+	  perform the multiplications using <code>MPY</code>
+	  followed by a right shift.
+	</para>
+
+	<code display="block" id="idp8810464">
+	  1     MPY    .M1    A0,A1,A2
+	  2     NOP
+	  3     SHR    .S1    A2,15,A2    ;lower 16 bit contains result
+	  4      	                        ;in Q-15 format
+	</code>
+
+	<para id="para32">
+	  Rather than throwing away the 15 LSBs of the multiplication
+	  result by shifting, you can round up the result by adding
+	  <code>0x4000</code> before shifting.
+	</para>
+
+	<code display="block" id="idm358160">
+	  1     MPY    .M1    A0,A1,A2
+	  2     NOP
+	  3     ADDK   .S1    4000h,A6
+	  4     SHR    .S1    A2,15,A2    ;lower 16 bit contains result
+	  5                               ;in Q-15 format
+	</code>
+      </section>
+
+      <section id="sec4">
+	<title>C language implementation</title>
+	<para id="para33">
+	  Let's suppose we have two 16-bit numbers in Q-15 format,
+	  stored in variable <code>x</code> and
+	  <code>y</code> as follows:
+	</para>
+
+	<code display="block" id="idp12866464">
+	  short x = 0x0011;     /*   0.000518799 in decimal */
+	  short y = 0xfe12;     /*  -0.015075684 in decimal */
+	  short z;              /* variable to store x*y */ 
+	</code>
+
+	<para id="para34">
+	  The product of <code>x</code> and <code>y</code> can be
+	  computed and stored in Q-15 format as follows:
+	</para>
+
+	<code display="block" id="idm1087776">
+	  z = (x * y) &gt;&gt; 15;
+	</code>
+
+	<para id="para35">
+	  The result of <code>x*y</code> is a 32-bit word with
+	  2 sign bits.  Right shifting it by 15 bits ignores the last
+	  15 bits, and storing the shifted result in
+	  <code>z</code> that is a <code>short</code>
+	  variable (16 bit) removes the extended sign bit by taking
+	  only lower 16 bits.
+	</para>
+      </section>
+    </section>
+  </content>
+  
+</document>

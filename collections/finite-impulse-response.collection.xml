@@ -1,0 +1,46 @@
+<col:collection xmlns="http://cnx.rice.edu/collxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:col="http://cnx.rice.edu/collxml" xml:lang="en">
+  <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
+    <md:content-id>col10226</md:content-id>
+    <md:title>Finite Impulse Response</md:title>
+    <md:language>en</md:language>
+    <md:license url="http://creativecommons.org/licenses/by/1.0">Creative Commons Attribution License</md:license>
+    <md:uuid>894ba24d-c93c-4776-8c92-5fe17b6f8fc5</md:uuid>
+<md:slug>finite-impulse-response</md:slug>
+</metadata>
+  <col:content>
+    <col:subcollection>
+      <md:title>Chapter 1</md:title>
+      <col:content>
+        <col:module document="m10872"/>
+        <col:module document="m11051"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Chapter 2</md:title>
+      <col:content>
+        <col:module document="m11054"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Chapter 3</md:title>
+      <col:content>
+        <col:module document="m10897"/>
+        <col:module document="m10908"/>
+        <col:module document="m10912"/>
+        <col:module document="m10914"/>
+        <col:module document="m10917"/>
+        <col:module document="m10918"/>
+        <col:module document="m10920"/>
+        <col:module document="m10923"/>
+        <col:module document="m10922"/>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Supplemental Material</md:title>
+      <col:content>
+        <col:module document="m10871"/>
+        <col:module document="m10921"/>
+      </col:content>
+    </col:subcollection>
+  </col:content>
+</col:collection>

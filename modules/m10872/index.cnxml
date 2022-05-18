@@ -1,0 +1,274 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+    <title>TMSC6211 Architecture Overview</title>
+    <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>07672515-aba8-4c47-82b0-7635aabc5041</md:uuid>
+</metadata>
+
+
+    <content>
+      <section id="s1">
+	<title>Overview of C6211 Architecture</title>
+	<para id="p1">
+	  The C62x consists of internal memory, peripherals (serial
+	  port, external memory interface, <foreign>etc.</foreign>),
+	  and most importantly, the CPU that has the registers and the
+	  functional units for execution of instructions.  Figure 1-1
+	  on the next page illustrates the internal structure of the
+	  CPU and the relation with the peripherals outside the
+	  CPU. Although you don't need to care about the internal
+	  architecture of the CPU for compiling and running programs,
+	  it is necessary to understand how the CPU fetches and
+	  executes the assembly instructions to write a highly
+	  optimized assembly program.
+	</para>
+
+	<para id="p2">
+	  We demonstrate the architecture and basic function of each
+	  CPU unit through the development of simple assembly language
+	  programs.
+	</para>
+
+	<section id="coredsp">
+	  <title>Core DSP operation</title>
+	  <para id="p3">
+	    In many DSP algorithms, the Sum of Product or
+	    Multiply-Accumulate (MAC) operations are very common. A
+	    DSP CPU is designed to handle the math-intensive
+	    calculations necessary for DSP algorithms.  For efficient
+	    implementation of the MAC operations, the C6211 CPU has
+	    two multipliers and each of them can perform a 16-bit
+	    multiplication in each clock cycle. For example, if we
+	    want to compute the dot product of two length-40 vectors
+	  <m:math>
+	    <m:ci><m:msub>
+		<m:mi>a</m:mi>
+		<m:mi>n</m:mi>
+	      </m:msub></m:ci>
+	  </m:math> and 
+	  <m:math>
+	    <m:ci><m:msub>
+		<m:mi>x</m:mi>
+		<m:mi>n</m:mi>
+	      </m:msub></m:ci>
+	  </m:math>, we need to compute 
+	  <m:math>
+	    <m:apply>
+	      <m:sum/>
+	      <m:bvar><m:ci>n</m:ci></m:bvar>
+	      <m:lowlimit><m:cn>1</m:cn></m:lowlimit>
+	      <m:uplimit><m:cn>40</m:cn></m:uplimit>
+	      <m:apply>
+		<m:times/>
+		<m:ci><m:msub>
+		    <m:mi>a</m:mi>
+		    <m:mi>n</m:mi>
+		  </m:msub></m:ci>
+		<m:ci><m:msub>
+		    <m:mi>x</m:mi>
+		    <m:mi>n</m:mi>
+		  </m:msub></m:ci>
+	      </m:apply>
+	    </m:apply>
+	  </m:math>.  (For example, the FIR filtering algorithm is
+	    exactly same as this dot product operation.)  When
+	  <m:math>
+	    <m:ci><m:msub>
+		<m:mi>a</m:mi>
+		<m:mi>n</m:mi>
+	      </m:msub></m:ci>
+	  </m:math> and 
+	  <m:math>
+	    <m:ci><m:msub>
+		<m:mi>x</m:mi>
+		<m:mi>n</m:mi>
+	      </m:msub></m:ci>
+	  </m:math> are stored in memory, starting from
+	  <m:math>
+	    <m:apply>
+	      <m:eq/>
+	      <m:ci>n</m:ci>
+	      <m:cn>1</m:cn>
+	    </m:apply>
+	  </m:math>, we need to compute 
+	  <m:math>
+	    <m:apply>
+	      <m:times/>
+	      <m:ci><m:msub>
+		  <m:mi>a</m:mi>
+		  <m:mi>n</m:mi>
+		</m:msub></m:ci>
+	      <m:ci><m:msub>
+		  <m:mi>x</m:mi>
+		  <m:mi>n</m:mi>
+		</m:msub></m:ci>
+	    </m:apply>
+	  </m:math> and add it to <m:math><m:ci>y</m:ci></m:math>
+	    (<m:math><m:ci>y</m:ci></m:math> is initially
+	    <m:math><m:cn>0</m:cn></m:math>) and repeat this up to
+	  <m:math>
+	    <m:apply>
+	      <m:eq/>
+	      <m:ci>n</m:ci>
+	      <m:cn>40</m:cn>
+	    </m:apply>
+	  </m:math>. In the C62x assembly, this MAC operation can be
+	    written as
+	  <code display="block" id="idm1395472">
+	    
+	    MPY .M a,x,prod
+	    ADD .L y,prod,y
+	    
+	  </code>
+	    Ignore <code>.M</code> and <code>.L</code> for now.  Here,
+	    <code>a,x,prod,y</code> are numbers stored in memory and
+	    the instruction <code>MPY</code> multiplies two numbers
+	    <code>a</code> and <code>x</code> together and stores the
+	    result in <code>prod</code>. The <code>ADD</code>
+	    instruction adds two numbers <code>y</code> and
+	    <code>prod</code> together storing the result back to
+	    <code>y</code>.
+	  </para>
+	</section>
+	<section id="rf">
+	  <title>Register Files</title>
+	  <para id="p5">
+	    Where are the numbers stored in the CPU? In C62x, the
+	    numbers used in operations are stored in the registers.
+	    Because the registers are directly accessible
+	    through the data bus of the CPU, accessing the registers are much
+	    faster than accessing data in the external memory.
+	  </para>
+	  <para id="p6">
+	    The C62x CPU has two register files consisting of sixteen
+	    32-bit registers each. There are two separate register
+	    files (A and B).  Each of these files contains sixteen
+	    32-bit registers (A0-A15 for file A and B0-B15 for file
+	    B). The general-purpose registers can be used for data,
+	    data address pointers, or condition registers.
+	  </para>
+	  <para id="p7">
+	    The general-purpose register files support data ranging in
+	    size from 16-bit data through 40-bit fixed-point. Values
+	    larger than 32 bits, such as 40-bit long quantities, are
+	    stored in register pairs. In a register pair, the 32 LSBs
+	    of data are placed in an even-numbered register and the
+	    remaining 8 MSBs in the next upper register (which is
+	    always an odd-numbered register).  In assembly language
+	    syntax, a colon between two register names denotes the
+	    register pairs, and the odd-numbered register is specified
+	    first. For example, A1:A0 represents the register pair
+	    consisting of A0 and A1. But you don't need to be
+	    concerned with the 40-bit numbers too much. Throughout
+	    this course, you will be mostly handling either 16 or
+	    32-bit values stored in a single register.  Let's for now
+	    focus on file A only.  The registers in the register file
+	    A are named A0 to A15. Each register can store a 32-bit
+	    binary number. The numbers such as <code>a,x,prod,y</code> above
+	    are stored in these registers. For example, register
+	    <code>A0</code> stores <code>a</code>. For now, let's assume we
+	    interpret all 32-bit numbers stored in registers as
+	    unsigned integer. Therefore, the range of values we can
+	    represent is 0 to 
+	  <m:math>
+	    <m:apply>
+	      <m:minus/>
+	      <m:apply>
+		<m:power/>
+		<m:cn>2</m:cn>
+		<m:cn>32</m:cn>
+	      </m:apply>
+	      <m:cn>1</m:cn>
+	    </m:apply>
+	  </m:math>.  (For representation of real numbers using binary
+	    bits, we will learn about the Q format numbers for
+	    fixed-point representation of real numbers.)  Let's assume
+	    the numbers <code>a,x,prod,y</code> are in the registers
+	    A0,A1,A3,A4, respectively. Then, the above assembly
+	    instructions can be written specifically
+	  </para>
+	  <code display="block" id="idm6625632">
+	    
+	    MPY .M1 A0,A1,A3
+	    ADD .L1 A4,A3,A4
+	    
+	  </code>
+
+	  <para id="p8">
+	    The TI C62x CPU has a load/store architecture. This means
+	    that all the numbers must be stored in the registers for
+	    being used as operands for the operations for instructions
+	    such as <code>MPY</code> and <code>ADD</code>. The numbers
+	    can be read from a memory location to a register (using,
+	    for example, <code>LDW, LDB</code> instructions) or a
+	    register can be loaded with a constant value. The content
+	    of a register can be stored to a memory location (using,
+	    for example, <code>STW, STB</code> instructions).
+	  </para>
+	  <para id="p9">
+	    In addition to the general-purpose register files, the CPU
+	    has a separate register file for the control
+	    registers. The control registers are used to control
+	    various CPU functions such as addressing mode, interrupts,
+	    <foreign>etc.</foreign>  You will learn more about some of
+	    the control registers when we learn each individual topic.
+	  </para>
+	</section>
+	<section id="fu">
+	  <title>Functional units</title>
+	  <para id="p10">
+	    Then, where do the actual operations such as
+	    multiplication and addition take place? The C62x CPU has
+	    several <emphasis>functional units</emphasis> that perform
+	    the actual operations. Each register file has 4 functional
+	    units named <code>.M</code>, <code>.L</code>,
+	    <code>.S</code>, and <code>.D</code>. (See Figure 1-1).
+	    The 4 functional units connected to the register file A
+	    are named <code>.L1</code>, <code>.S1</code>,
+	    <code>.D1</code>, and <code>.M1</code>. Those connected to
+	    the register file B are named <code>.L2</code>,
+	    <code>.S2</code>, <code>.D2</code>, and
+	    <code>.M2</code>. See Figure 1-1.  For example, the
+	    functional unit <code>.M1</code> performs multiplication
+	    on the operands that are in register file A.  When the CPU
+	    executes the <code>MPY .M1 A0,A1,A3</code> above, the
+	    functional unit <code>.M1</code> takes the values stored
+	    in <code>A0</code> and <code>A1</code>, multiply them
+	    together and stores the result to <code>A3</code>. The
+	    <code>.M1</code> in <code>MPY .M1 A0,A1,A3</code>
+	    indicates that this operation is performed in the
+	    <code>.M1</code> unit.  The <code>.M1</code> unit has a 16
+	    bit multiplier and all the multiplications are performed
+	    by the <code>.M1</code> unit.
+	  </para>
+	  <para id="p11">
+	    Similarly, the <code>ADD</code> operation can be executed
+	    by the <code>.L1</code> unit.  The <code>.L1</code> can
+	    perform all the logical operations such as bitwise AND
+	    operation (<code>AND</code> instruction) as well as basic
+	    addition (<code>ADD</code> instruction) and subtraction
+	    (<code>SUB</code> instruction).
+	  </para>
+	  <para id="p12">
+	    For complete list of instructions executed by each
+	    function unit, see Table 3-2 in the handout
+	    <emphasis>TMS320C62x/C64x/C67x Fixed-Point Instruction
+	    Set</emphasis>. We will later learn more about assigning
+	    the functional units for assembly instructions.
+	  </para>
+	  <exercise id="macasm">
+	    <problem id="idm7731936">
+	      <para id="e1">
+		Read the description of <code>ADD</code> and
+		<code>MPY</code> instructions in the TI manual handed
+		out. Write an assembly program that computes <code display="block" id="idp329424">A0*(A1+A2)+A3</code>.
+	      </para>
+	    </problem>
+	    <solution id="idp6196064">
+	      <para id="e1sol"> solution here </para>
+	    </solution>
+	  </exercise>
+	</section>
+      </section>
+
+    </content>
+    
+  </document>

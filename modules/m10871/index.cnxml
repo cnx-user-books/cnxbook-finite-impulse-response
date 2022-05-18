@@ -1,0 +1,75 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Rice DSP Lab Setup</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>070326a4-ac44-4d73-b8f1-6f86f064da91</md:uuid>
+</metadata>
+
+
+
+
+  <content>
+  <section id="labequip">
+   <title>Laboratory Equipment</title>
+   <para id="p1">
+Each lab PC is equipped with a Texas Instrument TMS320C6211 DSK board.
+The DSK board is hooked to the parallel port of the PC running Windows
+2000; the PC can control the DSK via the development environment
+called ``Code Composer Studio'' (CCS) developed by Texas Instrument.
+Currently we use CCS version 2.1.
+If you have your owlnet account, create the Samba password to log in
+to the machines. If you don't have an owlnet account,
+the TA will give you a username and password for local log in.
+    </para>
+    <para id="p2">
+For analog signal input and output, the DSK board has a 
+PCM3003 codec daughtercard mounted on the board.
+This board provides 16 bit stereo analog input and output
+channels at maximum sampling rate of 48kHz. Currently, the jumpers
+on the board are configured to provide a fixed 48kHz sampling
+rate both for input and output. <emphasis> Do not change the jumper
+settings unless you know what you are doing.</emphasis>
+For variable sampling rates, the timers of the C6211 processor
+can be used to generate appropriate clock signal. You will
+learn how to use the CPU timers in Lab 4.
+     </para>
+     <para id="p3">
+Each lab station is equipped with a function generator to provide
+signal to be used to test your signal-processing algorithms and an oscilloscope
+to display the processed waveforms. 
+     </para>
+     <para id="p4">
+The source analog signal
+also can be generated using the soundcard of the PC and input
+to the DSK board for processing. There are two shareware softwares
+installed on each PC that enables you to use the sound card
+as a tone generator and a simple spectrum analyzer. In the lab
+experiments, you will be using the tone generator to generate white noise
+input to the DSK board and you can watch the spectrum of the
+DSK output using the soundcard spectrum analyzer.       
+    </para>
+    </section>
+  <section id="hwsetup">
+  <title>Hardware Setup</title>
+    <para id="p5">
+The TI DSK board is connected to the parallel port of the PC.
+The board requires external power supply connected to it.
+A speaker and microphone can be connected to the board via
+the two 3.5mm jacks mounted on the daughtercard that are connected to
+the PCM3003 codec. The
+hardware reset button (white) is on the DSK board to
+enable hardware reset of the board. When reset, the board
+goes through several steps of self testing and initialization.
+Please refer to the online help of the Code Composer Studio
+for detailed board operation. After each hardware reset, the DSK board
+tends to lose the connection with the host PC. Therefore, you should close
+the CCS before performing hardware reset. Be sure to save all
+the files before closing the CCS. After the DSK board
+finishes the reset, start the CCS again.
+     </para>
+     <para id="p6">
+Be careful when you handle cables, tools, etc, not
+to short any circuits on the board.
+    </para>
+    </section> 
+  </content>
+  
+</document>

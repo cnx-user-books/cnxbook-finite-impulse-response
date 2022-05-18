@@ -1,0 +1,173 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+    <title>Assembly Implementation of FIR Filters on TI TMS320C62x</title>
+    <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>3b303e51-8faf-41cc-a075-d26fb8a9fb37</md:uuid>
+</metadata>
+
+
+
+    <content>
+      <section id="sec1">
+	<title>Implementation of FIR filters in assembly</title>
+	<section id="subsec1">
+	  <title>Storing filter coefficients</title>
+	  <para id="p1">
+	    Rather than defining the filter coefficients in your main
+	    assembly program file, it is usually more convenient to
+	    store them in a separate file.  By defining the
+	    coefficients in a separate assembly (for example,
+	    <code>coeff.asm</code>) file, you can load the
+	    coefficients at a desired memory location at the run time,
+	    although it is not essential for the current simple FIR
+	    filtering lab.
+	  </para>
+	  <para id="p2">
+	    The assembly file containing the filter coefficients can be written
+	    as follows:
+	  </para>
+	  <code display="block" id="idp525168">
+	    
+	    .def    _coef
+	    .sect   "coeffs"
+
+	    _coef: 
+	    .short  0ff9bh
+	    .short  0ff06h
+	    .short  0feffh
+	    .short  0ff93h
+	    .short  070h
+	    .short  0117h
+	    .short  0120h
+	    .short  07bh
+	    
+	  </code>
+	  <para id="p3">
+	    Each coefficient must be converted to the Q-15 format and
+	    defined by each <code>.short</code> assembly
+	    directive. For your convenience, I wrote a short MATLAB
+	    script <code>save_coef.m</code> that converts the filter
+	    coefficients stored as a MATLAB vector to Q-15 format and
+	    then writes to a file exactly in the above format. (You
+	    can download <code>save_coef.m</code> from the course web
+	    page.) The section <code>coeffs</code> should be defined
+	    in the link command file so that the coefficients are to
+	    be loaded at the correct memory location.
+	  </para>
+	  <para id="p4">
+	    You can simply include the <code>coeff.asm</code> using
+	    the <code>.include</code> directive at the beginning of
+	    your main assembly program.
+	  </para>
+	  <exercise id="ex1">
+	    <problem id="idm23120">
+	      <para id="p41">
+		Make coefficient files for each of the filters you
+		designed in the previous exercise.
+	      </para>
+	    </problem>
+	    <solution id="idp9501520">
+	      <para id="p42"/>
+	      <!-- one of (table figure codeblock list equation para) -->
+	    </solution>
+	  </exercise>
+	</section>
+	<section id="subsec2">
+	  <title>Assembly implementation</title>
+	  <para id="p5">
+	    Based on the codec input and output program you have
+	    written in the previous labs, you can now implement a
+	    real-time FIR filtering algorithm.
+	  </para>
+	  <exercise id="ex2">
+	    <problem id="idp9652640">
+	      <para id="p6">
+		Write an assembly routine that implements the FIR
+		filter by modifying the inner product program you have
+		written in Lab 3. Combine the FIR filtering routine
+		with the interrupt-based codec input-output code you
+		wrote in the previous lab. Your code should perform
+		FIR filtering on the input samples and output the
+		filtered result to the codec. Both the left and right
+		channels should be filtered.  To write the designed
+		MATLAB vector of filter coefficients as a
+		<code>.asm</code> file, use the provided
+		<code>save_coef.m</code> matlab function. First
+		implement the length-40 lowpass filter with 10kHz
+		cutoff designed using the <code>remez.m</code>.
+	      </para>
+	    </problem>
+	    <solution id="idp6908160">
+	      <para id="p61"/>
+	      <!-- one of (table figure codeblock list equation para) -->
+	    </solution>
+	  </exercise>
+	</section>
+	<section id="subsec3">
+	  <title>Implementation using circular addressing modes</title>
+	  <para id="p7">
+	    As you might already have noticed, a lot of cycles are
+	    wasted in FIR filtering while maintaining the buffer to
+	    see if you reached the end of buffer and update the
+	    address pointers properly.  To avoid this unnecessary
+	    buffer maintenance, the TI DSP processors have a special
+	    addressing mode, called <term>circular addressing</term>.
+	    Using circular addressing, you can define a block of
+	    memory as a circular buffer. As you increase (or decrease)
+	    the pointer register pointing to the buffer index beyond
+	    the buffer limit, it automatically points to the other end
+	    of the buffer, implementing a circle of data array.
+	    Instead of moving the data samples themselves, you can
+	    move the pointer which specifies the beginning of the
+	    buffer, as each new sample is processed. You don't need to
+	    check if you reached the end of buffer because the address
+	    pointer returns to the beginning of the buffer immediately
+	    after reaching the end.
+	  </para>
+	  <para id="p8">
+	    Of the 32 registers on the C6x, 8 of them can perform
+	    circular addressing.  These registers are A4 through A7
+	    and B4 through B7. Since circular addressing is not
+	    default, each of these registers must be specified as
+	    circular using the <code>AMR</code> (Address Mode
+	    Register) register.  The lower 16 bits of the
+	    <code>AMR</code> are used to select the mode for each of
+	    the 8 registers. The upper 10 bits (6 are reserved) are
+	    used to set the length of the circular buffer. Buffer size
+	    is determined by 
+	    <m:math>
+	      <m:apply>
+		<m:power/>
+		<m:cn>2</m:cn>
+		<m:apply>
+		  <m:plus/>
+		  <m:ci>N</m:ci>
+		  <m:cn>1</m:cn>
+		</m:apply>
+	      </m:apply>
+	    </m:math> bytes, where <m:math><m:ci>N</m:ci></m:math>
+	    is the value appearing in the block size fields of the
+	    <code>AMR</code> register.  The top address of the buffer
+	    needs to be aligned with proper physical memory block
+	    address using the <code>.align</code> assembler directive.
+	  </para>
+	  <exercise id="ex3">
+	    <problem id="idp629984">
+	      <para id="p9">
+		First read TMS320C62x/C67x CPU and Instruction Set
+		Reference Guide to learn how to define circular
+		buffers. Modify your FIR filtering assembly code to
+		use circular addressing modes.  After optimizing your
+		code as much as you can, count the number of required
+		clock cycles for each FIR filter output
+		computation. Compare the number with the code written
+		without circular addressing.
+	      </para>
+	    </problem>
+	    <solution id="idp1019952">
+	      <para id="p10"/>
+	    </solution>
+	  </exercise>
+	</section>
+      </section>
+    </content>
+    
+  </document>

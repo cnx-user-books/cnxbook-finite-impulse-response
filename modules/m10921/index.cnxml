@@ -1,0 +1,30 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Testing Filters in Rice DSP Lab</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>dde61757-1572-465b-96e8-b3c13b869aa4</md:uuid>
+</metadata>
+
+  <content>
+    <section id="sec1">
+      <title>Testing filters in Rice DSP Laboratory</title>
+      <para id="p1">
+	  You can test the implemented filters using the tone
+	  generator and spectrum analyzer on the PC.
+	</para>
+	<list id="filtertest" list-type="enumerated">
+	  <item>
+	    Connect the soundcard tone generator to the codec
+	    microphone jack to input 5kHz sine wave.  Connect the
+	    oscilloscope to observe both the codec input and
+	    output. As you change the frequency of the sine wave,
+	    observe how the amplitude of the filter output
+	    changes.</item>
+	  <item>
+	    Input white noise from PC sound card to the codec input
+	    and observe the spectrum of the filter output using the
+	    spectrum analyzer program. Can you see the filter
+	    frequency response?</item>
+      </list>
+    </section>
+  </content>
+  
+</document>

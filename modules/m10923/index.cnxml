@@ -1,0 +1,27 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>C Language Implementation of FIR Filters on TMS320C62x</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>c774ae79-a597-45d5-b487-95d9c847e6e0</md:uuid>
+</metadata>
+
+
+
+  <content>
+    <section id="sec1">
+      <title>C Language Implementation of FIR Filters</title>
+      <exercise id="ex1">
+	<problem id="idm2692160">
+	  <para id="p1">
+	      Write a C function implementing an FIR filter. Combine
+	      this routine with the provided codec input/output loop
+	      program to implement a real-time FIR filter. Test your
+	      filter program.
+	    </para>
+	</problem>
+	<solution id="idp126208">
+	  <para id="p2"/>
+	</solution>
+      </exercise>
+    </section>
+  </content>
+  
+</document>

@@ -1,0 +1,35 @@
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:md="http://cnx.rice.edu/mdml">
+  <title>Unit Sample Signal</title>
+  <metadata><md:content-id>undefined</md:content-id><md:title/><md:uuid>6b237e52-60c0-441c-b75a-6b3f4b64db7a</md:uuid>
+</metadata>
+
+
+
+  <content>
+    <section id="sec1">
+      <title>Unit Sample Signal</title>
+      <para id="p1">
+       The unit sample signal (unit impulse) in discrete-time systems
+	  is one of the most important signals, which is defined by
+	<equation id="eqn1">
+        <title>Unit Sample Signal</title>
+	  <m:math>
+	  </m:math>
+	</equation>
+     </para>
+    </section>
+    <figure id="fig1">
+      <title>Unit Sample Signal</title>
+      <media id="idp9652192" alt=""><image src="" mime-type="imag/jpeg"/></media>
+    </figure>
+    <para id="p2">
+	A discrete-time signal has a decomposition as a summation of
+	weighted and shifted unit sample.
+      <equation id="eqn2">
+	<m:math>
+	</m:math>
+      </equation>
+      </para>
+    </content>
+  
+  </document>
