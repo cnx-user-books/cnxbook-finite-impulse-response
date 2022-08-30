@@ -35,8 +35,7 @@
 	  </m:apply>
 	</m:math> is given by the convolution integral
       <equation id="eqn1">
-	<m:math>
-	</m:math>
+	
       </equation>
       </para>
       <para id="p2">
@@ -68,8 +67,7 @@
 	  </m:apply>
 	</m:math>) is given by the discrete-time convolution
 	<equation id="eqn2">
-	  <m:math>
-	  </m:math>
+	  
 	</equation>
       </para>
       </section>

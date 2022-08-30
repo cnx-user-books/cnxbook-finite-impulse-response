@@ -13,8 +13,7 @@
 	  is one of the most important signals, which is defined by
 	<equation id="eqn1">
         <title>Unit Sample Signal</title>
-	  <m:math>
-	  </m:math>
+	  
 	</equation>
      </para>
     </section>
@@ -26,8 +25,7 @@
 	A discrete-time signal has a decomposition as a summation of
 	weighted and shifted unit sample.
       <equation id="eqn2">
-	<m:math>
-	</m:math>
+	
       </equation>
       </para>
     </content>

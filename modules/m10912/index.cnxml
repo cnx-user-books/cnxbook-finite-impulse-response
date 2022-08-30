@@ -57,8 +57,7 @@
 	  </m:math> is obtained by the inverse
 	DTFT as
 	  <equation id="eqn1">
-	    <m:math>
-	    </m:math>
+	    
 	  </equation>
 	  For general desired frequency response, 
 	  <m:math>
@@ -108,8 +107,7 @@
 	    </m:apply>
 	  </m:math> given by
 	  <equation id="eqn2">
-	    <m:math>
-	    </m:math>
+	    
 	  </equation>
 	  where 
 	  <m:math>
@@ -121,8 +119,7 @@
 	  simple truncation corresponds to the <emphasis>boxcar
 	  window</emphasis> given as
 	  <equation id="eqn3">
-	    <m:math>
-	    </m:math>
+	    
 	  </equation>
 	  Other commonly used windows include Bartlett, Hamming,
 	  Hanning, and Blackman windows.
